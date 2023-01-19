@@ -12,7 +12,7 @@ public class Building {
     @Column(name = "idBuilding", nullable = false)
     private long idBuilding;
     @Basic
-    @Column(name = "address", nullable = false, length = 255)
+    @Column(name = "address", nullable = false, length = 255, unique = true)
     private String address;
     @Basic
     @Column(name = "name", nullable = false, length = 255)
