@@ -14,8 +14,6 @@ public class Main {
 //        CompanyDAO.deleteCompanyById(1);
 //        CompanyDAO.deleteCompanyById(2);
 //        CompanyDAO.getAllCompanies().forEach(System.out::println);
-
-        SessionFactoryUtil.getSessionFactory();
-//        UserInterface.getInstance().start();
+        UserInterface.getInstance().start();
     }
 }

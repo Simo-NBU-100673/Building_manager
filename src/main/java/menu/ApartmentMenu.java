@@ -1,5 +1,6 @@
 package menu;
 
+import java.util.Map;
 import java.util.Scanner;
 
 public class ApartmentMenu extends AbstractMenu {
@@ -8,6 +9,11 @@ public class ApartmentMenu extends AbstractMenu {
     @Override
     protected void handleInput(int num) {
         System.out.println("Hello from ApartmentMenu");
+    }
+
+    @Override
+    protected Map<Integer, Runnable> populateActionsMap() {
+        return null;
     }
 
     @Override

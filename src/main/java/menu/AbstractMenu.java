@@ -3,6 +3,8 @@ package menu;
 import menu.string.container.MenuErrStringContainer;
 import menu.string.container.MenuStringContainer;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public abstract class AbstractMenu implements Menu, Comparable<AbstractMenu> {
@@ -10,9 +12,12 @@ public abstract class AbstractMenu implements Menu, Comparable<AbstractMenu> {
 
     private final String menuString;
 
+    protected Map<Integer, Runnable> actions;
+
     public AbstractMenu() {
         this.lengthOfMenu = calculateLengthOfMenu();
         this.menuString = MenuStringContainer.getInstance().getMenu(getMenuNumber());
+        actions = populateActionsMap();
     }
 
     public int calculateLengthOfMenu() {
@@ -90,6 +95,8 @@ public abstract class AbstractMenu implements Menu, Comparable<AbstractMenu> {
     protected abstract void handleInput(int num);
 
     protected abstract int getMenuNumber();
+
+    protected abstract Map<Integer, Runnable> populateActionsMap();
 
     @Override
     public int compareTo(AbstractMenu o) {
