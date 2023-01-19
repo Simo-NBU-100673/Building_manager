@@ -1,4 +1,5 @@
 import gui.UserInterface;
+import session.SessionFactoryUtil;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,8 +15,7 @@ public class Main {
 //        CompanyDAO.deleteCompanyById(2);
 //        CompanyDAO.getAllCompanies().forEach(System.out::println);
 
-        //TODO make a relationship between Company and Employee (1 to many)
-        //TODO make a taxes table too
-        UserInterface.getInstance().start();
+        SessionFactoryUtil.getSessionFactory();
+//        UserInterface.getInstance().start();
     }
 }

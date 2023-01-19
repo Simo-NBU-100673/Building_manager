@@ -7,8 +7,8 @@ import java.util.Objects;
 
 @Entity
 public class Resident {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idResident", nullable = false)
     private long idResident;
     @Basic

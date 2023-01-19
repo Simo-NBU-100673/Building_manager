@@ -7,8 +7,8 @@ import java.util.Objects;
 
 @Entity
 public class Paymentshistory {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idPayment", nullable = false)
     private long idPayment;
     @Basic

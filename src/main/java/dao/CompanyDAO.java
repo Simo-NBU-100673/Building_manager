@@ -1,7 +1,6 @@
 package dao;
 
 import entity.Company;
-import entity.Employee;
 
 import java.util.Collection;
 

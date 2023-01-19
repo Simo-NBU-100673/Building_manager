@@ -7,8 +7,8 @@ import java.util.Objects;
 
 @Entity
 public class Building {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idBuilding", nullable = false)
     private long idBuilding;
     @Basic
@@ -21,6 +21,7 @@ public class Building {
     private Collection<Apartment> apartmentsByIdBuilding;
     @OneToOne(mappedBy = "buildingByBuildingId")
     private Contract contractByIdBuilding;
-
+    @OneToMany(mappedBy = "buildingByBuildingId")
+    private Collection<Tax> taxesByIdBuilding;
 
 }

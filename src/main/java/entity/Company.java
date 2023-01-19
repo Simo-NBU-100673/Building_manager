@@ -7,39 +7,14 @@ import java.util.Objects;
 
 @Entity
 public class Company {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idCompany", nullable = false)
     private long idCompany;
     @Basic
-    @Column(name = "name", nullable = false, length = 255, unique = true)
+    @Column(name = "name", nullable = false, length = 255)
     private String name;
     @OneToMany(mappedBy = "companyByCompanyId")
-    private Collection<Contract> contractsByIdCompany;
+    private Collection<Employee> employeesByIdCompany;
 
-    public Company() {
-        this.name="";
-    }
-
-    public Company(long idCompany) {
-        this.idCompany = idCompany;
-        this.name="";
-    }
-
-    public Company(String name) {
-        this.name = name;
-    }
-
-    public Company(long idCompany, String name) {
-        this.idCompany = idCompany;
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Company{" +
-                "idCompany=" + idCompany +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

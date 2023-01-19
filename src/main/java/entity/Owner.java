@@ -17,7 +17,7 @@ public class Owner {
     @Basic
     @Column(name = "last_name", nullable = false, length = 45)
     private String lastName;
+    @OneToMany(mappedBy = "ownerByOwnerId")
+    private Collection<Apartment> apartmentsByIdOwner;
 
-    @OneToMany(mappedBy = "owner")
-    private Collection<Apartment> apartments;
 }
