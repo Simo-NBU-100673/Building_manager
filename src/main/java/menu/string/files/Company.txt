@@ -1,0 +1,20 @@
+  |====================================================|
+  |            [Operations with Company]               |
+  |====================================================|
+  |  1.  Create a new company                          |
+  |  2.  Edit a company                                |
+  |  3.  Delete a company                              |
+  |  4.  List all companies                            |
+  |  5.  List all contracts of a company               |
+  |  6.  List all employees of a company               |
+  |  7.  List all buildings of a company               |
+  |  8.  List the count of all contracts of a company  |
+  |  9.  List the count of all employees of a company  |
+  |  10. List the count of all buildings of a company  |
+  |  11. Print name of company                         |
+  |  12. Hire employee                                 |
+  |  13. Fire employee                                 |
+  |  14. Print name of company                         |
+  |====================================================|
+  |                       [1/5]         (NEXT)         |
+  |====================================================|

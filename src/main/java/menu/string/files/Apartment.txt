@@ -1,0 +1,19 @@
+  |====================================================|
+  |            [Operations with Apartments]            |
+  |====================================================|
+  |  1.  Create a new apartment                        |
+  |  2.  Edit an apartment                             |
+  |  3.  Delete apartment                              |
+  |  4.  List all residents in the apartment           |
+  |  5.  Add resident                                  |
+  |  6.  Remove resident                               |
+  |  7.  Print floor of the apartment                  |
+  |  8.  List all pets living in the apartment         |
+  |  9.  Print the taxes for the apartment             |
+  |  10. Print the owner of the apartment              |
+  |  11. Print last date when taxes were paid          |
+  |  12. Print all payments from apartment             |
+  |  13. Pay taxes                                     |
+  |====================================================|
+  |         (BACK)        [3/5]         (NEXT)         |
+  |====================================================|

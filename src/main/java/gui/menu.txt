@@ -1,0 +1,95 @@
+  |====================================================|
+  |            [Operations with Company]               |
+  |====================================================|
+  |  1.  Create a new company                          |
+  |  2.  Edit a company                                |
+  |  3.  Delete a company                              |
+  |  4.  List all companies                            |
+  |  5.  List all contracts of a company               |
+  |  6.  List all employees of a company               |
+  |  7.  List all buildings of a company               |
+  |  8.  List the count of all contracts of a company  |
+  |  9.  List the count of all employees of a company  |
+  |  10. List the count of all buildings of a company  |
+  |  11. Print name of company                         |
+  |  12. Hire employee                                 |
+  |  13. Fire employee                                 |
+  |  14. Print name of company                         |
+  |====================================================|
+  |                       [1/5]         (NEXT)         |
+  |====================================================|
+
+  |====================================================|
+  |            [Operations with Building]              |
+  |====================================================|
+  |  1.  Create a new building                         |
+  |  2.  Edit a building                               |
+  |  3.  Delete a building                             |
+  |  4.  List all apartments in the building           |
+  |  5.  List all contracts of a company               |
+  |  6.  List all employees of a company               |
+  |  7.  List all buildings of a company               |
+  |  8.  List the count of all contracts of a company  |
+  |  9.  List the count of all employees of a company  |
+  |  10. List the count of all buildings of a company  |
+  |  11. Print address of building                     |
+  |  12. Print name of building                        |
+  |  13. Assign new tax                                |
+  |  14. Remove a tax from building                    |
+  |  15. Print all taxes of building                   |
+  |  16. Edit a tax of building                        |
+  |====================================================|
+  |         (BACK)        [2/5]         (NEXT)         |
+  |====================================================|
+
+
+  |====================================================|
+  |            [Operations with Apartments]            |
+  |====================================================|
+  |  1.  Create a new apartment                        |
+  |  2.  Edit an apartment                             |
+  |  3.  Delete apartment                              |
+  |  4.  List all residents in the apartment           |
+  |  5.  Add resident                                  |
+  |  6.  Remove resident                               |
+  |  7.  Print floor of the apartment                  |
+  |  8.  List all pets living in the apartment         |
+  |  9.  Print the taxes for the apartment             |
+  |  10. Print the owner of the apartment              |
+  |  11. Print last date when taxes were paid          |
+  |  12. Print all payments from apartment             |
+  |  13. Pay taxes                                     |
+  |====================================================|
+  |         (BACK)        [3/5]         (NEXT)         |
+  |====================================================|
+
+
+  |====================================================|
+  |            [Operations with Employee]              |
+  |====================================================|
+  |  1.  Create a employee                             |
+  |  2.  Edit an employee                              |
+  |  3.  Delete employee                               |
+  |  4.  List all employees with managed buildings     |
+  |  5.  Print employee                                |
+  |====================================================|
+  |         (BACK)        [4/5]         (NEXT)         |
+  |====================================================|
+
+
+  |====================================================|
+  |                 [Merged operation]                 |
+  |====================================================|
+  |  1.  Print Companies by paid taxes                 |
+  |  2.  Print Employees by name and managed buildings |
+  |  3.  Print Residents by name and age               |
+  |  4.  Print all (Employees : Managed Buildings)     |
+  |  5.  Print all (Building : Apartments)             |
+  |  6.  Print all (Building : Residents)              |
+  |  7.  Print all due payment buildings and employee  |
+  |  8.  Print all paid buildings and employee         |
+  |  9.  Print detailed report and save it to file:    |
+  |      - report.txt                                  |
+  |====================================================|
+  |         (BACK)        [5/5]                        |
+  |====================================================|
