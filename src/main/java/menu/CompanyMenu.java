@@ -64,38 +64,21 @@ public class CompanyMenu extends AbstractMenu {
 
     private void createNewCompany() {
         try {
-            System.out.print("Enter ID and NAME separated by (space): ");
+            System.out.print("Enter the company's NAME and press (ENTER): ");
 
-            String[] inputs = userInput.nextLine().split(" ");
-            validateInputs(inputs);
+            String input = userInput.nextLine();
+            String name = parseName(input);
 
-            long id = parseId(inputs[0]);
-            String name = parseName(inputs[1]);
-
-            Company company = new Company(id, name);
+            Company company = new Company(name);
             checkCompanyExists(company);
             CompanyDAO.saveCompany(company);
 
-        } catch (NoSuchElementException | SQLIntegrityConstraintViolationException | IndexOutOfBoundsException | IllegalArgumentException e) {
+        } catch (NoSuchElementException | SQLIntegrityConstraintViolationException | IllegalArgumentException e) {
             String errMessage = MenuErrStringContainer
                     .getInstance()
                     .convertToErrMessageBox(e.getMessage());
 
             System.out.println(errMessage);
-        }
-    }
-
-    private void validateInputs(String[] inputs) {
-        if (inputs.length < 2) {
-            throw new IndexOutOfBoundsException("Invalid input, enter ID and NAME separated by (space)");
-        }
-    }
-
-    private long parseId(String input) {
-        try {
-            return Long.parseLong(input);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Invalid ID, enter a numeric value");
         }
     }
 

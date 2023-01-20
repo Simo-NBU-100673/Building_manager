@@ -8,14 +8,11 @@ import java.util.Objects;
 @Entity
 public class Company {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idCompany", nullable = false)
-    private long idCompany;
     @Basic
-    @Column(name = "name", nullable = false, length = 255, unique=true)
+    @Column(name = "name", nullable = false, length = 255)
     private String name;
-    @OneToMany(mappedBy = "companyByCompanyId")
-    private Collection<Employee> employeesByIdCompany;
+    @OneToMany(mappedBy = "companyByCompanyName")
+    private Collection<Employee> employeesByCompanyName;
 
     public Company() {
         this.name = "No name";
@@ -25,18 +22,6 @@ public class Company {
         this.name = name;
     }
 
-    public Company(long idCompany, String name) {
-        this.idCompany = idCompany;
-        this.name = name;
-    }
-
-    public long getIdCompany() {
-        return idCompany;
-    }
-
-    public void setIdCompany(long idCompany) {
-        this.idCompany = idCompany;
-    }
 
     public String getName() {
         return name;
@@ -46,12 +31,12 @@ public class Company {
         this.name = name;
     }
 
-    public Collection<Employee> getEmployeesByIdCompany() {
-        return employeesByIdCompany;
+    public Collection<Employee> getEmployeesByCompanyName() {
+        return employeesByCompanyName;
     }
 
-    public void setEmployeesByIdCompany(Collection<Employee> employeesByIdCompany) {
-        this.employeesByIdCompany = employeesByIdCompany;
+    public void setEmployeesByCompanyName(Collection<Employee> employeesByCompanyName) {
+        this.employeesByCompanyName = employeesByCompanyName;
     }
 
     @Override
