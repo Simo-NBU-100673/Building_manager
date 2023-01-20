@@ -1,7 +1,17 @@
 package menu;
 
+import dao.CompanyDAO;
+import entity.Company;
+import menu.string.container.MenuErrStringContainer;
+
+import java.io.ByteArrayInputStream;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.regex.PatternSyntaxException;
 
 public class CompanyMenu extends AbstractMenu {
     private static final int menuNumber = 1;
@@ -52,9 +62,56 @@ public class CompanyMenu extends AbstractMenu {
         super.actions.get(num).run();
     }
 
-    private void createNewCompany(){
-        System.out.println("createNewCompany");
+    private void createNewCompany() {
+        try {
+            System.out.print("Enter ID and NAME separated by (space): ");
+
+            String[] inputs = userInput.nextLine().split(" ");
+            validateInputs(inputs);
+
+            long id = parseId(inputs[0]);
+            String name = parseName(inputs[1]);
+
+            Company company = new Company(id, name);
+            checkCompanyExists(company);
+            CompanyDAO.saveCompany(company);
+
+        } catch (NoSuchElementException | SQLIntegrityConstraintViolationException | IndexOutOfBoundsException | IllegalArgumentException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
     }
+
+    private void validateInputs(String[] inputs) {
+        if (inputs.length < 2) {
+            throw new IndexOutOfBoundsException("Invalid input, enter ID and NAME separated by (space)");
+        }
+    }
+
+    private long parseId(String input) {
+        try {
+            return Long.parseLong(input);
+        } catch (NumberFormatException e) {
+            throw new NumberFormatException("Invalid ID, enter a numeric value");
+        }
+    }
+
+    private String parseName(String input) {
+        if (input.isEmpty()) {
+            throw new NoSuchElementException("Invalid name, enter a non-empty value");
+        }
+        return input;
+    }
+
+    private void checkCompanyExists(Company company) throws SQLIntegrityConstraintViolationException {
+        if (CompanyDAO.containsCompany(company)) {
+            throw new SQLIntegrityConstraintViolationException("Company with name " + company.getName() + " already exists");
+        }
+    }
+
 
     private void editCompany(){
         System.out.println("editCompany");

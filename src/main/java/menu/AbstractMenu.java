@@ -14,37 +14,41 @@ public abstract class AbstractMenu implements Menu, Comparable<AbstractMenu> {
 
     protected Map<Integer, Runnable> actions;
 
+    protected Scanner userInput;
+
     public AbstractMenu() {
         this.lengthOfMenu = calculateLengthOfMenu();
         this.menuString = MenuStringContainer.getInstance().getMenu(getMenuNumber());
         actions = populateActionsMap();
+        userInput = new Scanner(System.in);
     }
 
     public int calculateLengthOfMenu() {
         int length = 0;
         String menu = MenuStringContainer.getInstance().getMenu(getMenuNumber());
-        Scanner scanner = new Scanner(menu);
 
-        while (scanner.hasNextLine()) {
-            length++;
-            scanner.nextLine();
+        try(Scanner scanner = new Scanner(menu)){
+            while (scanner.hasNextLine()) {
+                length++;
+                scanner.nextLine();
+            }
         }
 
         return length - 6;
     }
 
     public String openMenu() {
-
-        Scanner userInput = new Scanner(System.in);
         String input = "";
 
         while (true) {
+
             printMenu();
 
             //listen for input from user and set menuNumber with Scanner
             input = userInput.nextLine().trim().toLowerCase();
 
             if (input.equals("exit")) {
+                userInput.close();
                 return "exit";
             }
 

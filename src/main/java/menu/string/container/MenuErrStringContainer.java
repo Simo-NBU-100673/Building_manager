@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class MenuErrStringContainer {
     private static volatile MenuErrStringContainer instance;
     private final String errMessage;
+
     private MenuErrStringContainer() {
         errMessage = StringContainer.getStringFromFile("ErrMessage.txt");
     }
@@ -16,7 +17,7 @@ public class MenuErrStringContainer {
         if (result != null) {
             return result;
         }
-        synchronized(MenuStringContainer.class) {
+        synchronized (MenuStringContainer.class) {
             if (instance == null) {
                 instance = new MenuErrStringContainer();
             }
@@ -26,5 +27,15 @@ public class MenuErrStringContainer {
 
     public String getErrMessage(int errNumber) {
         return String.format(errMessage, errNumber);
+    }
+
+    public String convertToErrMessageBox(String errMessage) {
+        int errMessageLength = errMessage.length() + 2;
+
+        String result = "\n  |" + "=".repeat(errMessageLength) + "|" +
+                "\n  | " + errMessage + " |" +
+                "\n  |" + "=".repeat(errMessageLength) + "|";
+
+        return result;
     }
 }
