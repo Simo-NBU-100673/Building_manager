@@ -43,7 +43,7 @@ public class CompanyMenu extends AbstractMenu {
         return actions;
     }
 
-    //  |  1.  Create a new company                          |
+    //  |  1.  Create a new company                          | DONE
     //  |  2.  Edit a company                                |
     //  |  3.  Delete a company                              |
     //  |  4.  List all companies                            |

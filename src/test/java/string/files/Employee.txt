@@ -1,0 +1,11 @@
+  |====================================================|
+  |            [Operations with Employee]              |
+  |====================================================|
+  |  1.  Create a employee                             |
+  |  2.  Edit an employee                              |
+  |  3.  Delete employee                               |
+  |  4.  List all employees with managed buildings     |
+  |  5.  Print employee                                |
+  |====================================================|
+  |         (BACK)        [4/5]         (NEXT)         |
+  |====================================================|
