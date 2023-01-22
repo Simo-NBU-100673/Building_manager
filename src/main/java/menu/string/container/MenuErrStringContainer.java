@@ -1,9 +1,5 @@
 package menu.string.container;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-
 public class MenuErrStringContainer {
     private static volatile MenuErrStringContainer instance;
     private final String errMessage;
@@ -30,12 +26,30 @@ public class MenuErrStringContainer {
     }
 
     public String convertToErrMessageBox(String errMessage) {
-        int errMessageLength = errMessage.length() + 2;
+            //split the errMessage into Strings of max length 50
+            String[] errMessageArray = errMessage.split("(?<=\\G.{50})");
 
-        String result = "\n  |" + "=".repeat(errMessageLength) + "|" +
-                "\n  | " + errMessage + " |" +
-                "\n  |" + "=".repeat(errMessageLength) + "|";
+            //create a StringBuilder to store the result
+            StringBuilder result = new StringBuilder();
 
-        return result;
+            //add the first line
+            result.append(getLineBreaker());
+
+            for(String errMessagePart : errMessageArray){
+                result
+                        .append("\n  | ")
+                        .append(errMessagePart)
+                        .append(" ".repeat(50 - errMessagePart.length()))
+                        .append(" |");
+            }
+
+            //add the last line
+            result.append(getLineBreaker());
+
+            return result.toString();
+    }
+
+    private String getLineBreaker() {
+        return "\n  |" + "=".repeat(52) + "|";
     }
 }
