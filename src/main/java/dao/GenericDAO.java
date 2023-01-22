@@ -1,6 +1,7 @@
 package dao;
 
 
+import jakarta.persistence.PersistenceException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import session.SessionFactoryUtil;
@@ -48,6 +49,8 @@ abstract class GenericDAO<T> {
             Transaction transaction = session.beginTransaction();
             session.save(entity);
             transaction.commit();
+        } catch (PersistenceException e){
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -59,8 +62,9 @@ abstract class GenericDAO<T> {
             Transaction transaction = session.beginTransaction();
             entities.stream().forEach(session::save);
             transaction.commit();
+        } catch (PersistenceException e){
+            throw new IllegalArgumentException(e);
         }
-
     }
 
     //readById

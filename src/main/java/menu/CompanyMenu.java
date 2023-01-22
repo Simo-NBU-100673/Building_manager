@@ -70,10 +70,9 @@ public class CompanyMenu extends AbstractMenu {
             String name = parseName(input);
 
             Company company = new Company(name);
-            checkCompanyExists(company);
             CompanyDAO.saveCompany(company);
 
-        } catch (NoSuchElementException | SQLIntegrityConstraintViolationException | IllegalArgumentException e) {
+        } catch (NoSuchElementException | IllegalArgumentException e) {
             String errMessage = MenuErrStringContainer
                     .getInstance()
                     .convertToErrMessageBox(e.getMessage());
@@ -88,13 +87,6 @@ public class CompanyMenu extends AbstractMenu {
         }
         return input;
     }
-
-    private void checkCompanyExists(Company company) throws SQLIntegrityConstraintViolationException {
-        if (CompanyDAO.containsCompany(company)) {
-            throw new SQLIntegrityConstraintViolationException("Company with name " + company.getName() + " already exists");
-        }
-    }
-
 
     private void editCompany(){
         System.out.println("editCompany");
