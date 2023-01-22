@@ -94,8 +94,13 @@ public class CompanyMenu extends AbstractMenu {
 
             if(CompanyDAO.exists(company)){
                 System.out.println("Company exists");
+                System.out.println("Enter the NEW name of the company and press (ENTER): ");
+                String newName = userInput.nextLine();
+                company.setName(newName);
+                CompanyDAO.updateCompany(company);
+
             } else {
-                System.out.println("Company does not exist");
+                throw new IllegalArgumentException("Company does not exist");
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {

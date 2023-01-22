@@ -41,7 +41,7 @@ public final class CompanyDAO extends GenericDAO<Company> {
     }
 
     //Working but PK must be the same
-    public static void updateEmployee(Company company) {
+    public static void updateCompany(Company company) {
         COMPANY_DAO.update(company);
     }
 
