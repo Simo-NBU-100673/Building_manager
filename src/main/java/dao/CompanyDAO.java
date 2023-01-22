@@ -1,10 +1,13 @@
 package dao;
 
 import entity.Company;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import org.hibernate.NonUniqueObjectException;
+import org.hibernate.Session;
 import session.SessionFactoryUtil;
 
 import java.util.Collection;
@@ -58,15 +61,28 @@ public final class CompanyDAO extends GenericDAO<Company> {
         CriteriaBuilder builder = SessionFactoryUtil.getSessionFactory().createEntityManager().getCriteriaBuilder();
         CriteriaQuery<Company> criteria = builder.createQuery(Company.class);
         Root<Company> root = criteria.from(Company.class);
-        criteria.select(root);
-        criteria.where(builder.equal(root.get("name"), name));
-        TypedQuery<Company> query = SessionFactoryUtil.getSessionFactory().createEntityManager().createQuery(criteria);
+        criteria
+                .select(root)
+                .where(builder.equal(root.get("name"), name));
 
-        return query.getSingleResult();
+        Company company = SessionFactoryUtil
+                .getSessionFactory()
+                .createEntityManager()
+                .createQuery(criteria)
+                .getSingleResult();
+
+        return company;
     }
-    public static boolean containsCompany(Company company) throws IllegalArgumentException{
+    public static boolean exists(Company company) throws IllegalArgumentException{
         ensureNotNull(company);
-        return getAllCompanies().contains(company);
+
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            TypedQuery<Company> query = session.createQuery("SELECT name FROM Company WHERE name=:name", Company.class);
+            query.setParameter("name", company.getName());
+            return query.getSingleResult() != null;
+        }catch (NoResultException | NonUniqueObjectException e){
+            return false;
+        }
     }
 
     public static void ensureNotNull(Company company){

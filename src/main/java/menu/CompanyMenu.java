@@ -4,14 +4,9 @@ import dao.CompanyDAO;
 import entity.Company;
 import menu.string.container.MenuErrStringContainer;
 
-import java.io.ByteArrayInputStream;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.regex.PatternSyntaxException;
 
 public class CompanyMenu extends AbstractMenu {
     private static final int menuNumber = 1;
@@ -83,13 +78,34 @@ public class CompanyMenu extends AbstractMenu {
 
     private String parseName(String input) {
         if (input.isEmpty()) {
-            throw new NoSuchElementException("Invalid name, enter a non-empty value");
+            throw new IllegalArgumentException("Invalid name, enter a non-empty value");
         }
         return input;
     }
 
     private void editCompany(){
-        System.out.println("editCompany");
+        try {
+            System.out.print("Enter the company's NAME that you want to edit and press (ENTER): ");
+
+            String input = userInput.nextLine();
+            String name = parseName(input);
+
+            Company company = new Company(name);
+
+            if(CompanyDAO.exists(company)){
+                System.out.println("Company exists");
+            } else {
+                System.out.println("Company does not exist");
+            }
+
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
+
     }
 
     private void deleteCompany(){
