@@ -5,6 +5,7 @@ import entity.Company;
 import menu.string.container.MenuErrStringContainer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -39,9 +40,9 @@ public class CompanyMenu extends AbstractMenu {
     }
 
     //  |  1.  Create a new company                          | DONE
-    //  |  2.  Edit a company                                |
-    //  |  3.  Delete a company                              |
-    //  |  4.  List all companies                            |
+    //  |  2.  Edit a company                                | DONE
+    //  |  3.  Delete a company                              | DONE
+    //  |  4.  List all companies                            | DONE
     //  |  5.  List all contracts of a company               |
     //  |  6.  List all employees of a company               |
     //  |  7.  List all buildings of a company               |
@@ -83,7 +84,7 @@ public class CompanyMenu extends AbstractMenu {
         return input;
     }
 
-    private void editCompany(){
+    private void editCompany() {
         try {
             System.out.print("Enter the company's NAME that you want to edit and press (ENTER): ");
 
@@ -92,12 +93,15 @@ public class CompanyMenu extends AbstractMenu {
 
             Company company = new Company(name);
 
-            if(CompanyDAO.exists(company)){
+            if (CompanyDAO.exists(company)) {
                 System.out.println("Company exists");
                 System.out.println("Enter the NEW name of the company and press (ENTER): ");
                 String newName = userInput.nextLine();
-                company.setName(newName);
-                CompanyDAO.updateCompany(company);
+
+                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company tmpCompany = new Company(companyDB.getIdCompany(), newName);
+
+                CompanyDAO.updateCompany(tmpCompany);
 
             } else {
                 throw new IllegalArgumentException("Company does not exist");
@@ -113,47 +117,85 @@ public class CompanyMenu extends AbstractMenu {
 
     }
 
-    private void deleteCompany(){
-        System.out.println("deleteCompany");
+    private void deleteCompany() {
+        try {
+            System.out.print("Enter the company's NAME that you want to DELETE and press (ENTER): ");
+
+            String input = userInput.nextLine();
+            String name = parseName(input);
+
+            Company company = new Company(name);
+
+            if (CompanyDAO.exists(company)) {
+                System.out.println("Company successfully deleted!");
+
+                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+
+                CompanyDAO.deleteCompany(tmpCompany);
+
+            } else {
+                throw new IllegalArgumentException("Company does not exist");
+            }
+
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
     }
 
-    private void listAllCompanies(){
-        System.out.println("listAllCompanies");
+    private void listAllCompanies() {
+        try {
+            List<Company> companies = CompanyDAO.getAllCompanies();
+
+            System.out.println("\nList of all companies: ");
+            companies.forEach(System.out::println);
+
+        } catch (IllegalArgumentException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
     }
 
-    private void listAllContractsOfCompany(){
+    private void listAllContractsOfCompany() {
         System.out.println("listAllContractsOfCompany");
     }
 
-    private void listAllEmployeesOfCompany(){
+    private void listAllEmployeesOfCompany() {
         System.out.println("listAllEmployeesOfCompany");
     }
 
-    private void listAllBuildingsOfCompany(){
+    private void listAllBuildingsOfCompany() {
         System.out.println("listAllBuildingsOfCompany");
     }
 
-    private void listCountOfAllContractsOfCompany(){
+    private void listCountOfAllContractsOfCompany() {
         System.out.println("listCountOfAllContractsOfCompany");
     }
 
-    private void listCountOfAllEmployeesOfCompany(){
+    private void listCountOfAllEmployeesOfCompany() {
         System.out.println("listCountOfAllEmployeesOfCompany");
     }
 
-    private void listCountOfAllBuildingsOfCompany(){
+    private void listCountOfAllBuildingsOfCompany() {
         System.out.println("listCountOfAllBuildingsOfCompany");
     }
 
-    private void printNameOfCompany(){
+    private void printNameOfCompany() {
         System.out.println("printNameOfCompany");
     }
 
-    private void hireEmployee(){
+    private void hireEmployee() {
         System.out.println("hireEmployee");
     }
 
-    private void fireEmployee(){
+    private void fireEmployee() {
         System.out.println("fireEmployee");
     }
 

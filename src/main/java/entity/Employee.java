@@ -18,8 +18,8 @@ public class Employee {
     @Column(name = "last_name", nullable = false, length = 45)
     private String lastName;
     @ManyToOne
-    @JoinColumn(name = "Company_name", referencedColumnName = "name")
-    private Company companyByCompanyName;
+    @JoinColumn(name = "Company_id", referencedColumnName = "idCompany")
+    private Company companyByCompanyId;
     @OneToMany(mappedBy = "employeeByEmployeeId")
     private Collection<Contract> contractsByIdEmployee;
 

@@ -11,6 +11,8 @@ import org.hibernate.Session;
 import session.SessionFactoryUtil;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public final class CompanyDAO extends GenericDAO<Company> {
 
@@ -25,6 +27,7 @@ public final class CompanyDAO extends GenericDAO<Company> {
     public static void saveCompany(Company company) {
         COMPANY_DAO.create(company);
     }
+
     //Working
     public static void saveCompanies(Collection<Company> companies) {
         COMPANY_DAO.create(companies);
@@ -36,8 +39,21 @@ public final class CompanyDAO extends GenericDAO<Company> {
     }
 
     //Working
-    public static Collection<Company> getAllCompanies() {
-        return COMPANY_DAO.getAllEntities();
+    public static List<Company> getAllCompanies() {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            List<Company> companies = session
+                    .createQuery("SELECT a FROM Company a ORDER BY a.idCompany ASC ", Company.class)
+                    .getResultList();
+
+            if (companies.isEmpty()){
+                throw new IllegalArgumentException("No companies found");
+            }
+
+            return companies;
+
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     //Working but PK must be the same
@@ -57,7 +73,7 @@ public final class CompanyDAO extends GenericDAO<Company> {
 
     //throws NoSuchFileException when the file does not exist
     //throws NonUniqueResultException when there are multiple file that are adequate to the criteria
-    public static Company getCompanyByName(String name){
+    public static Company getCompanyByName(String name) {
         CriteriaBuilder builder = SessionFactoryUtil.getSessionFactory().createEntityManager().getCriteriaBuilder();
         CriteriaQuery<Company> criteria = builder.createQuery(Company.class);
         Root<Company> root = criteria.from(Company.class);
@@ -73,20 +89,21 @@ public final class CompanyDAO extends GenericDAO<Company> {
 
         return company;
     }
-    public static boolean exists(Company company) throws IllegalArgumentException{
+
+    public static boolean exists(Company company) throws IllegalArgumentException {
         ensureNotNull(company);
 
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             TypedQuery<Company> query = session.createQuery("SELECT name FROM Company WHERE name=:name", Company.class);
             query.setParameter("name", company.getName());
             return query.getSingleResult() != null;
-        }catch (NoResultException | NonUniqueObjectException e){
+        } catch (NoResultException | NonUniqueObjectException e) {
             return false;
         }
     }
 
-    public static void ensureNotNull(Company company){
-        if (company == null){
+    public static void ensureNotNull(Company company) {
+        if (company == null) {
             throw new IllegalArgumentException();
         }
     }
