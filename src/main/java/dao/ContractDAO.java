@@ -1,5 +1,6 @@
 package dao;
 
+import entity.Building;
 import entity.Company;
 import entity.Contract;
 import org.hibernate.Session;
@@ -38,6 +39,33 @@ public class ContractDAO extends GenericDAO<Contract>{
         }
 
         return contracts;
+    }
+
+    public static List<Building> getBuildingsByCompany(Company company) {
+        ensureNotNull(company);
+
+        List<Building> buildings;
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            //gets all contracts where Employee works in the company which was given
+            buildings = session
+                    .createQuery("" +
+                            "SELECT c.buildingByBuildingId " +
+                            "FROM Contract c " +
+                            "JOIN c.employeeByEmployeeId e " +
+                            "WHERE e.companyByCompanyId = :company " +
+                            "", Building.class)
+                    .setParameter("company", company)
+                    .getResultList();
+            transaction.commit();
+        }
+
+        if(buildings.isEmpty()){
+            throw new IllegalArgumentException("No contracts found");
+        }
+
+        return buildings;
     }
 
     public static void ensureNotNull(Company company) {
