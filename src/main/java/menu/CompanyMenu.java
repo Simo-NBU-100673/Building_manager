@@ -2,8 +2,10 @@ package menu;
 
 import dao.CompanyDAO;
 import dao.ContractDAO;
+import dao.EmployeeDAO;
 import entity.Company;
 import entity.Contract;
+import entity.Employee;
 import menu.string.container.MenuErrStringContainer;
 
 import java.util.HashMap;
@@ -195,7 +197,33 @@ public class CompanyMenu extends AbstractMenu {
     }
 
     private void listAllEmployeesOfCompany() {
-        System.out.println("listAllEmployeesOfCompany");
+        try {
+            System.out.print("Enter the company's NAME for which you want\nto see the hired employees and press (ENTER): ");
+
+            String input = userInput.nextLine();
+            String name = parseName(input);
+
+            Company company = new Company(name);
+
+            if (CompanyDAO.exists(company)) {
+                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+
+                List<Employee>employees = EmployeeDAO.getEmployeesByCompany(tmpCompany);
+                System.out.println("\nList of all employees: ");
+                employees.forEach(System.out::println);
+
+            } else {
+                throw new IllegalArgumentException("Company does not exist");
+            }
+
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
     }
 
     private void listAllBuildingsOfCompany() {

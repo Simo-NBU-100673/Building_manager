@@ -1,8 +1,14 @@
 package dao;
 
+import entity.Company;
+import entity.Contract;
 import entity.Employee;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import session.SessionFactoryUtil;
 
 import java.util.Collection;
+import java.util.List;
 
 //TODO make singleton with DLC
 public final class EmployeeDAO extends GenericDAO<Employee> {
@@ -47,5 +53,36 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
     //Working
     public static void deleteEmployeeById(int id) {
         EMPLOYEE_DAO.deleteById(id);
+    }
+
+    public static List<Employee> getEmployeesByCompany(Company company) {
+        ensureNotNull(company);
+
+        List<Employee> employees;
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            //gets all contracts where Employee works in the company which was given
+            employees = session
+                    .createQuery("" +
+                            "SELECT e FROM Employee e " +
+                            "WHERE e.companyByCompanyId = :company " +
+                            "", Employee.class)
+                    .setParameter("company", company)
+                    .getResultList();
+            transaction.commit();
+        }
+
+        if(employees.isEmpty()){
+            throw new IllegalArgumentException("No contracts found");
+        }
+
+        return employees;
+    }
+
+    public static void ensureNotNull(Company company) {
+        if (company == null) {
+            throw new IllegalArgumentException();
+        }
     }
 }
