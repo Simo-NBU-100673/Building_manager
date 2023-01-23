@@ -181,7 +181,7 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                List<Contract>contracts = ContractDAO.getContractsByCompany(tmpCompany);
+                List<Contract> contracts = ContractDAO.getContractsByCompany(tmpCompany);
                 contracts.forEach(System.out::println);
 
             } else {
@@ -210,7 +210,7 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                List<Employee>employees = EmployeeDAO.getEmployeesByCompany(tmpCompany);
+                List<Employee> employees = EmployeeDAO.getEmployeesByCompany(tmpCompany);
                 System.out.println("\nList of all employees: ");
                 employees.forEach(System.out::println);
 
@@ -240,7 +240,7 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                List<Building>employees = ContractDAO.getBuildingsByCompany(tmpCompany);
+                List<Building> employees = ContractDAO.getBuildingsByCompany(tmpCompany);
                 System.out.println("\nList of all buildings: ");
                 employees.forEach(System.out::println);
 
@@ -258,7 +258,32 @@ public class CompanyMenu extends AbstractMenu {
     }
 
     private void listCountOfAllContractsOfCompany() {
-        System.out.println("listCountOfAllContractsOfCompany");
+        try {
+            System.out.print("Enter the company's NAME for which you want\nto see the hired employees and press (ENTER): ");
+
+            String input = userInput.nextLine();
+            String name = parseName(input);
+
+            Company company = new Company(name);
+
+            if (CompanyDAO.exists(company)) {
+                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+
+                long countOfContractsPerCompany = ContractDAO.getOfBuildingsPerCompany(tmpCompany);
+                System.out.println("\nCount of contracts of Company (" + name + "): "+ countOfContractsPerCompany);
+
+            } else {
+                throw new IllegalArgumentException("Company does not exist");
+            }
+
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
     }
 
     private void listCountOfAllEmployeesOfCompany() {

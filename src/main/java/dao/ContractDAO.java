@@ -3,6 +3,8 @@ package dao;
 import entity.Building;
 import entity.Company;
 import entity.Contract;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import session.SessionFactoryUtil;
@@ -66,6 +68,31 @@ public class ContractDAO extends GenericDAO<Contract>{
         }
 
         return buildings;
+    }
+
+    public static long getOfBuildingsPerCompany(Company company) {
+        ensureNotNull(company);
+
+        long numberOfBuildings;
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            //gets all contracts where Employee works in the company which was given
+            numberOfBuildings = session
+                    .createQuery("" +
+                            "SELECT COUNT(c.buildingByBuildingId) " +
+                            "FROM Contract c " +
+                            "JOIN c.employeeByEmployeeId e " +
+                            "WHERE e.companyByCompanyId = :company " +
+                            "", Long.class)
+                    .setParameter("company", company)
+                    .getSingleResult();
+            transaction.commit();
+        }catch (NoResultException | NonUniqueResultException e){
+            throw new IllegalArgumentException(e);
+        }
+
+        return numberOfBuildings;
     }
 
     public static void ensureNotNull(Company company) {
