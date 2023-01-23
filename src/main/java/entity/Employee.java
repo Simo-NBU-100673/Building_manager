@@ -23,4 +23,12 @@ public class Employee {
     @OneToMany(mappedBy = "employeeByEmployeeId")
     private Collection<Contract> contractsByIdEmployee;
 
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "idEmployee=" + idEmployee +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 }

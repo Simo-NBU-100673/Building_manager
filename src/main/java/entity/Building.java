@@ -24,4 +24,12 @@ public class Building {
     @OneToMany(mappedBy = "buildingByBuildingId")
     private Collection<Tax> taxesByIdBuilding;
 
+    @Override
+    public String toString() {
+        return "Building{" +
+                "idBuilding=" + idBuilding +
+                ", address='" + address + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

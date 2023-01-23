@@ -1,6 +1,7 @@
 package dao;
 
 import entity.Company;
+import entity.Contract;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -8,6 +9,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.hibernate.NonUniqueObjectException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import session.SessionFactoryUtil;
 
 import java.util.Collection;

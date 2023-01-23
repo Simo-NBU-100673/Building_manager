@@ -14,4 +14,11 @@ public class Contract {
     @JoinColumn(name = "Employee_id", referencedColumnName = "idEmployee", nullable = false)
     private Employee employeeByEmployeeId;
 
+    @Override
+    public String toString() {
+        return "Contract{" +
+                "Building=" + buildingByBuildingId +
+                ", Employee=" + employeeByEmployeeId +
+                '}';
+    }
 }
