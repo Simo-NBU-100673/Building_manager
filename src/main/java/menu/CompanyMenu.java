@@ -44,19 +44,6 @@ public class CompanyMenu extends AbstractMenu {
         return actions;
     }
 
-    //  |  1.  Create a new company                          | DONE
-    //  |  2.  Edit a company                                | DONE
-    //  |  3.  Delete a company                              | DONE
-    //  |  4.  List all companies                            | DONE
-    //  |  5.  List all contracts of a company               | DONE
-    //  |  6.  List all employees of a company               | DONE
-    //  |  7.  List all buildings of a company               | DONE
-    //  |  8.  List the count of all contracts of a company  | DONE
-    //  |  9.  List the count of all employees of a company  | DONE
-    //  |  10. List the count of all buildings of a company  | DONE
-    //  |  11. Hire employee                                 | DONE
-    //  |  12. Fire employee                                 | DONE
-
     @Override
     protected void handleInput(int num) {
         super.actions.get(num).run();
@@ -73,11 +60,7 @@ public class CompanyMenu extends AbstractMenu {
             CompanyDAO.saveCompany(company);
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -112,11 +95,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -142,11 +121,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -158,11 +133,7 @@ public class CompanyMenu extends AbstractMenu {
             companies.forEach(System.out::println);
 
         } catch (IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -187,11 +158,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -217,11 +184,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -247,11 +210,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -276,11 +235,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -305,11 +260,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -334,11 +285,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -367,11 +314,7 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException | IndexOutOfBoundsException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
     }
 
@@ -408,12 +351,16 @@ public class CompanyMenu extends AbstractMenu {
             }
 
         } catch (NoSuchElementException | IllegalArgumentException | IndexOutOfBoundsException e) {
-            String errMessage = MenuErrStringContainer
-                    .getInstance()
-                    .convertToErrMessageBox(e.getMessage());
-
-            System.out.println(errMessage);
+            printErrMessage(e);
         }
+    }
+
+    private void printErrMessage(RuntimeException e){
+        String errMessage = MenuErrStringContainer
+                .getInstance()
+                .convertToErrMessageBox(e.getMessage());
+
+        System.out.println(errMessage);
     }
 
 }
