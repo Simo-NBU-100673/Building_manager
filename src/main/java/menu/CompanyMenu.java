@@ -52,11 +52,7 @@ public class CompanyMenu extends AbstractMenu {
     private void createNewCompany() {
         try {
             System.out.print("Enter the company's NAME and press (ENTER): ");
-
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
             CompanyDAO.saveCompany(company);
 
         } catch (NoSuchElementException | IllegalArgumentException e) {
@@ -64,28 +60,18 @@ public class CompanyMenu extends AbstractMenu {
         }
     }
 
-    private String parseName(String input) {
-        if (input.isEmpty()) {
-            throw new IllegalArgumentException("Invalid name, enter a non-empty value");
-        }
-        return input;
-    }
-
     private void editCompany() {
         try {
             System.out.print("Enter the company's NAME that you want to edit and press (ENTER): ");
 
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
 
             if (CompanyDAO.exists(company)) {
                 System.out.println("Company exists");
                 System.out.println("Enter the NEW name of the company and press (ENTER): ");
                 String newName = userInput.nextLine();
 
-                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
                 Company tmpCompany = new Company(companyDB.getIdCompany(), newName);
 
                 CompanyDAO.updateCompany(tmpCompany);
@@ -103,16 +89,13 @@ public class CompanyMenu extends AbstractMenu {
         try {
             System.out.print("Enter the company's NAME that you want to DELETE and press (ENTER): ");
 
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
 
             if (CompanyDAO.exists(company)) {
                 System.out.println("Company successfully deleted!");
 
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
 
                 CompanyDAO.deleteCompany(tmpCompany);
 
@@ -141,14 +124,11 @@ public class CompanyMenu extends AbstractMenu {
         try {
             System.out.print("Enter the company's NAME for which you want\nto see the contracts and press (ENTER): ");
 
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
 
             if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
 
                 List<Contract> contractsByCompany = ContractDAO.getContractsByCompany(tmpCompany);
                 contractsByCompany.forEach(System.out::println);
@@ -166,14 +146,11 @@ public class CompanyMenu extends AbstractMenu {
         try {
             System.out.print("Enter the company's NAME for which you want\nto see the hired employees and press (ENTER): ");
 
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
 
             if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
 
                 List<Employee> employeesByCompany = EmployeeDAO.getEmployeesByCompany(tmpCompany);
                 System.out.println("\nList of all employees: ");
@@ -192,14 +169,11 @@ public class CompanyMenu extends AbstractMenu {
         try {
             System.out.print("Enter the company's NAME for which you want\nto see the hired employees and press (ENTER): ");
 
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
 
             if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
 
                 List<Building> buildingsByCompany = ContractDAO.getBuildingsByCompany(tmpCompany);
                 System.out.println("\nList of all buildings: ");
@@ -218,17 +192,14 @@ public class CompanyMenu extends AbstractMenu {
         try {
             System.out.print("Enter the company's NAME for which you want\nto see the contracts COUNT and press (ENTER): ");
 
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
 
             if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
 
                 long countOfContractsOfCompany = ContractDAO.getCountOfContractsOfCompany(tmpCompany);
-                System.out.println("\nCount of contracts of Company (" + name + "): "+ countOfContractsOfCompany);
+                System.out.println("\nCount of contracts of Company (" + company.getName() + "): "+ countOfContractsOfCompany);
 
             } else {
                 throw new IllegalArgumentException("Company does not exist");
@@ -243,17 +214,14 @@ public class CompanyMenu extends AbstractMenu {
         try {
             System.out.print("Enter the company's NAME for which you want\nto see the hired employees COUNT and press (ENTER): ");
 
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
 
             if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
 
                 long countOfEmployeesOfCompany = EmployeeDAO.getCountOfEmployeesOfCompany(tmpCompany);
-                System.out.println("\nCount of employees of Company (" + name + "): "+ countOfEmployeesOfCompany);
+                System.out.println("\nCount of employees of Company (" + company.getName() + "): "+ countOfEmployeesOfCompany);
 
             } else {
                 throw new IllegalArgumentException("Company does not exist");
@@ -268,17 +236,14 @@ public class CompanyMenu extends AbstractMenu {
         try {
             System.out.print("Enter the company's NAME for which you want\nto see the COUNT of theirs buildings and press (ENTER): ");
 
-            String input = userInput.nextLine();
-            String name = parseName(input);
-
-            Company company = new Company(name);
+            Company company = getCompanyFromUserInput();
 
             if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
 
                 long countOfBuildingsOfCompany = BuildingDAO.getCountOfBuildingsOfCompany(tmpCompany);
-                System.out.println("\nCount of buildings of Company (" + name + "): "+ countOfBuildingsOfCompany);
+                System.out.println("\nCount of buildings of Company (" + company.getName() + "): "+ countOfBuildingsOfCompany);
 
             } else {
                 throw new IllegalArgumentException("Company does not exist");
@@ -361,6 +326,21 @@ public class CompanyMenu extends AbstractMenu {
                 .convertToErrMessageBox(e.getMessage());
 
         System.out.println(errMessage);
+    }
+
+    private Company getCompanyFromUserInput() throws NoSuchElementException, IllegalArgumentException {
+        String input = userInput.nextLine();
+        String name = parseName(input);
+        Company company = new Company(name);
+
+        return company;
+    }
+
+    private String parseName(String input) {
+        if (input.isEmpty()) {
+            throw new IllegalArgumentException("Invalid name, enter a non-empty value");
+        }
+        return input;
     }
 
 }
