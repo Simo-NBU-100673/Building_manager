@@ -122,11 +122,20 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
         }
     }
 
-    public static boolean isHired(long idEmployee) {
+    public static boolean isHired(long idEmployee, Company company) {
+        ensureNotNull(company);
+
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Query<Company> query = session.createQuery("SELECT e.companyByCompanyId FROM Employee e WHERE e.idEmployee =:id", Company.class);
             query.setParameter("id", idEmployee);
-            return query.getSingleResult() != null;
+
+            Company result = query.getSingleResult();
+            if (result == null){
+                return false;
+            }
+
+            return result.equals(company);
+
         } catch (NoResultException | NonUniqueObjectException e) {
             return false;
         }
@@ -137,13 +146,44 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
         ensureNotNull(employee);
 
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            //first check is the Employee already hired if not then hire
-            if (!isHired(employee.getIdEmployee())) {
-                employee.setCompanyByCompanyId(tmpCompany);
-                session.update(employee);
+            Query<Employee> query = session.createQuery("SELECT e FROM Employee e WHERE e.idEmployee =:id", Employee.class);
+            query.setParameter("id", employee.getIdEmployee());
+            session.beginTransaction();
+
+            Employee result = query.getSingleResult();
+            if (result.getCompanyByCompanyId() != null){
+                throw new IllegalArgumentException("Employee already hired");
             }
-            transaction.commit();
+
+            result.setCompanyByCompanyId(tmpCompany);
+            session.update(result);
+            session.getTransaction().commit();
+
+        } catch (NoResultException | NonUniqueObjectException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static void fireEmployee(Company tmpCompany, Employee employee) {
+        ensureNotNull(tmpCompany);
+        ensureNotNull(employee);
+
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<Employee> query = session.createQuery("SELECT e FROM Employee e WHERE e.idEmployee =:id", Employee.class);
+            query.setParameter("id", employee.getIdEmployee());
+            session.beginTransaction();
+
+            Employee result = query.getSingleResult();
+            if (!result.getCompanyByCompanyId().equals(tmpCompany)){
+                throw new IllegalArgumentException("Can not fire employee who does not work in this company");
+            }
+
+            result.setCompanyByCompanyId(null);
+            session.update(result);
+            session.getTransaction().commit();
+
+        } catch (NoResultException | NonUniqueObjectException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 

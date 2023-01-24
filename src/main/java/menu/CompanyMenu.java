@@ -356,10 +356,6 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                if(EmployeeDAO.isHired(idEmployee)){
-                    throw new IllegalArgumentException("Employee is already hired");
-                }
-
                 Employee employeeDB = EmployeeDAO.getEmployeeById(idEmployee);
                 Employee tmpEmployee = new Employee(employeeDB);
 
@@ -388,7 +384,36 @@ public class CompanyMenu extends AbstractMenu {
     }
 
     private void fireEmployee() {
-        System.out.println("fireEmployee");
+        try {
+            System.out.print("Enter the company's {NAME} (space) {EMPLOYEE_ID} and then press (ENTER): ");
+
+            String[] input = userInput.nextLine().split(" ");
+            String name = parseName(input[0]);
+            long idEmployee = parseId(input[1]);
+
+            Company company = new Company(name);
+            Employee employee = new Employee(idEmployee);
+            if (CompanyDAO.exists(company) && EmployeeDAO.exists(employee)) {
+                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+
+                Employee employeeDB = EmployeeDAO.getEmployeeById(idEmployee);
+                Employee tmpEmployee = new Employee(employeeDB);
+
+                EmployeeDAO.fireEmployee(tmpCompany, tmpEmployee);
+                System.out.println("\nEmployee (" + tmpEmployee.getFirstName() +" " + tmpEmployee.getLastName()+ ") fired successfully");
+
+            } else {
+                throw new IllegalArgumentException("Company or Employee does not exist");
+            }
+
+        } catch (NoSuchElementException | IllegalArgumentException | IndexOutOfBoundsException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
     }
 
 }
