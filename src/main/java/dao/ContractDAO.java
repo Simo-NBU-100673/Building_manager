@@ -70,15 +70,15 @@ public class ContractDAO extends GenericDAO<Contract>{
         return buildings;
     }
 
-    public static long getCountOfBuildingsPerCompany(Company company) {
+    public static long getCountOfContractsOfCompany(Company company) {
         ensureNotNull(company);
 
-        long numberOfBuildings;
+        long numberOfContracts;
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
 
             //gets all contracts where Employee works in the company which was given
-            numberOfBuildings = session
+            numberOfContracts = session
                     .createQuery("" +
                             "SELECT COUNT(c.buildingByBuildingId) " +
                             "FROM Contract c " +
@@ -92,7 +92,7 @@ public class ContractDAO extends GenericDAO<Contract>{
             throw new IllegalArgumentException(e);
         }
 
-        return numberOfBuildings;
+        return numberOfContracts;
     }
 
     public static void ensureNotNull(Company company) {

@@ -1,5 +1,6 @@
 package menu;
 
+import dao.BuildingDAO;
 import dao.CompanyDAO;
 import dao.ContractDAO;
 import dao.EmployeeDAO;
@@ -37,9 +38,8 @@ public class CompanyMenu extends AbstractMenu {
         actions.put(8, this::listCountOfAllContractsOfCompany);
         actions.put(9, this::listCountOfAllEmployeesOfCompany);
         actions.put(10, this::listCountOfAllBuildingsOfCompany);
-        actions.put(11, this::printNameOfCompany);
-        actions.put(12, this::hireEmployee);
-        actions.put(13, this::fireEmployee);
+        actions.put(11, this::hireEmployee);
+        actions.put(12, this::fireEmployee);
 
         return actions;
     }
@@ -119,7 +119,6 @@ public class CompanyMenu extends AbstractMenu {
 
             System.out.println(errMessage);
         }
-
     }
 
     private void deleteCompany() {
@@ -259,7 +258,7 @@ public class CompanyMenu extends AbstractMenu {
 
     private void listCountOfAllContractsOfCompany() {
         try {
-            System.out.print("Enter the company's NAME for which you want\nto see the hired employees and press (ENTER): ");
+            System.out.print("Enter the company's NAME for which you want\nto see the contracts COUNT and press (ENTER): ");
 
             String input = userInput.nextLine();
             String name = parseName(input);
@@ -270,7 +269,7 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                long countOfContractsOfCompany = ContractDAO.getCountOfBuildingsPerCompany(tmpCompany);
+                long countOfContractsOfCompany = ContractDAO.getCountOfContractsOfCompany(tmpCompany);
                 System.out.println("\nCount of contracts of Company (" + name + "): "+ countOfContractsOfCompany);
 
             } else {
@@ -316,11 +315,32 @@ public class CompanyMenu extends AbstractMenu {
     }
 
     private void listCountOfAllBuildingsOfCompany() {
-        System.out.println("listCountOfAllBuildingsOfCompany");
-    }
+        try {
+            System.out.print("Enter the company's NAME for which you want\nto see the COUNT of theirs buildings and press (ENTER): ");
 
-    private void printNameOfCompany() {
-        System.out.println("printNameOfCompany");
+            String input = userInput.nextLine();
+            String name = parseName(input);
+
+            Company company = new Company(name);
+
+            if (CompanyDAO.exists(company)) {
+                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+
+                long countOfBuildingsOfCompany = BuildingDAO.getCountOfBuildingsOfCompany(tmpCompany);
+                System.out.println("\nCount of buildings of Company (" + name + "): "+ countOfBuildingsOfCompany);
+
+            } else {
+                throw new IllegalArgumentException("Company does not exist");
+            }
+
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
     }
 
     private void hireEmployee() {

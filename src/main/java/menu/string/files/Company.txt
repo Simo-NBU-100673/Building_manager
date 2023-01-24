@@ -11,9 +11,8 @@
   |  8.  List the count of all contracts of a company  |
   |  9.  List the count of all employees of a company  |
   |  10. List the count of all buildings of a company  |
-  |  11. Print name of company                         |
-  |  12. Hire employee                                 |
-  |  13. Fire employee                                 |
+  |  11. Hire employee                                 |
+  |  12. Fire employee                                 |
   |====================================================|
   |                       [1/5]         (NEXT)         |
   |====================================================|
