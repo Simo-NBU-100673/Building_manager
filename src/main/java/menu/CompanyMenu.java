@@ -48,11 +48,11 @@ public class CompanyMenu extends AbstractMenu {
     //  |  2.  Edit a company                                | DONE
     //  |  3.  Delete a company                              | DONE
     //  |  4.  List all companies                            | DONE
-    //  |  5.  List all contracts of a company               |
-    //  |  6.  List all employees of a company               |
-    //  |  7.  List all buildings of a company               |
-    //  |  8.  List the count of all contracts of a company  |
-    //  |  9.  List the count of all employees of a company  |
+    //  |  5.  List all contracts of a company               | DONE
+    //  |  6.  List all employees of a company               | DONE
+    //  |  7.  List all buildings of a company               | DONE
+    //  |  8.  List the count of all contracts of a company  | DONE
+    //  |  9.  List the count of all employees of a company  | DONE
     //  |  10. List the count of all buildings of a company  |
     //  |  11. Print name of company                         |
     //  |  12. Hire employee                                 |
@@ -181,8 +181,8 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                List<Contract> contracts = ContractDAO.getContractsByCompany(tmpCompany);
-                contracts.forEach(System.out::println);
+                List<Contract> contractsByCompany = ContractDAO.getContractsByCompany(tmpCompany);
+                contractsByCompany.forEach(System.out::println);
 
             } else {
                 throw new IllegalArgumentException("Company does not exist");
@@ -210,9 +210,9 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                List<Employee> employees = EmployeeDAO.getEmployeesByCompany(tmpCompany);
+                List<Employee> employeesByCompany = EmployeeDAO.getEmployeesByCompany(tmpCompany);
                 System.out.println("\nList of all employees: ");
-                employees.forEach(System.out::println);
+                employeesByCompany.forEach(System.out::println);
 
             } else {
                 throw new IllegalArgumentException("Company does not exist");
@@ -240,9 +240,9 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                List<Building> employees = ContractDAO.getBuildingsByCompany(tmpCompany);
+                List<Building> buildingsByCompany = ContractDAO.getBuildingsByCompany(tmpCompany);
                 System.out.println("\nList of all buildings: ");
-                employees.forEach(System.out::println);
+                buildingsByCompany.forEach(System.out::println);
 
             } else {
                 throw new IllegalArgumentException("Company does not exist");
@@ -270,8 +270,8 @@ public class CompanyMenu extends AbstractMenu {
                 Company companyDB = CompanyDAO.getCompanyByName(name);
                 Company tmpCompany = new Company(companyDB.getIdCompany(), name);
 
-                long countOfContractsPerCompany = ContractDAO.getOfBuildingsPerCompany(tmpCompany);
-                System.out.println("\nCount of contracts of Company (" + name + "): "+ countOfContractsPerCompany);
+                long countOfContractsOfCompany = ContractDAO.getCountOfBuildingsPerCompany(tmpCompany);
+                System.out.println("\nCount of contracts of Company (" + name + "): "+ countOfContractsOfCompany);
 
             } else {
                 throw new IllegalArgumentException("Company does not exist");
@@ -287,7 +287,32 @@ public class CompanyMenu extends AbstractMenu {
     }
 
     private void listCountOfAllEmployeesOfCompany() {
-        System.out.println("listCountOfAllEmployeesOfCompany");
+        try {
+            System.out.print("Enter the company's NAME for which you want\nto see the hired employees COUNT and press (ENTER): ");
+
+            String input = userInput.nextLine();
+            String name = parseName(input);
+
+            Company company = new Company(name);
+
+            if (CompanyDAO.exists(company)) {
+                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+
+                long countOfEmployeesOfCompany = EmployeeDAO.getCountOfEmployeesOfCompany(tmpCompany);
+                System.out.println("\nCount of employees of Company (" + name + "): "+ countOfEmployeesOfCompany);
+
+            } else {
+                throw new IllegalArgumentException("Company does not exist");
+            }
+
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
     }
 
     private void listCountOfAllBuildingsOfCompany() {

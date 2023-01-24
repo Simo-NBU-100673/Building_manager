@@ -70,7 +70,7 @@ public class ContractDAO extends GenericDAO<Contract>{
         return buildings;
     }
 
-    public static long getOfBuildingsPerCompany(Company company) {
+    public static long getCountOfBuildingsPerCompany(Company company) {
         ensureNotNull(company);
 
         long numberOfBuildings;
