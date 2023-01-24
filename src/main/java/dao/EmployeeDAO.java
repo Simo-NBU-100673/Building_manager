@@ -1,7 +1,6 @@
 package dao;
 
 import entity.Company;
-import entity.Contract;
 import entity.Employee;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
@@ -180,6 +179,28 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
 
             result.setCompanyByCompanyId(null);
             session.update(result);
+            session.getTransaction().commit();
+
+        } catch (NoResultException | NonUniqueObjectException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static void deleteAllEmployeesByCompany(Company company) {
+        ensureNotNull(company);
+
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<Employee> query = session.createQuery("SELECT e FROM Employee e WHERE e.companyByCompanyId =:company", Employee.class);
+            query.setParameter("company", company);
+            session.beginTransaction();
+
+            List<Employee> result = query.getResultList();
+
+            for (Employee employee : result) {
+                employee.setCompanyByCompanyId(null);
+                session.update(employee);
+            }
+
             session.getTransaction().commit();
 
         } catch (NoResultException | NonUniqueObjectException e) {

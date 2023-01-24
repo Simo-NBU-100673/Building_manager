@@ -1,7 +1,6 @@
 package dao;
 
 import entity.Company;
-import entity.Contract;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -9,12 +8,10 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.hibernate.NonUniqueObjectException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import session.SessionFactoryUtil;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public final class CompanyDAO extends GenericDAO<Company> {
 
@@ -65,6 +62,10 @@ public final class CompanyDAO extends GenericDAO<Company> {
 
     //Working but PK must be the same
     public static void deleteCompany(Company company) {
+        //fire all employees of this company and then delete the company
+        EmployeeDAO.deleteAllEmployeesByCompany(company);
+
+        //delete the company
         COMPANY_DAO.delete(company);
     }
 

@@ -54,8 +54,8 @@ public class CompanyMenu extends AbstractMenu {
     //  |  8.  List the count of all contracts of a company  | DONE
     //  |  9.  List the count of all employees of a company  | DONE
     //  |  10. List the count of all buildings of a company  | DONE
-    //  |  11. Hire employee                                 |
-    //  |  12. Fire employee                                 |
+    //  |  11. Hire employee                                 | DONE
+    //  |  12. Fire employee                                 | DONE
 
     @Override
     protected void handleInput(int num) {
