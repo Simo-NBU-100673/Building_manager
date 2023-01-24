@@ -76,6 +76,7 @@ abstract class GenericDAO<T> {
             Transaction transaction = session.beginTransaction();
             entity = session.get(type, id);
             transaction.commit();
+//            session.evict(entity);
         }
         checkIfFound(entity);
 

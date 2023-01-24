@@ -5,8 +5,11 @@ import entity.Contract;
 import entity.Employee;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
+import jakarta.persistence.TypedQuery;
+import org.hibernate.NonUniqueObjectException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import session.SessionFactoryUtil;
 
 import java.util.Collection;
@@ -16,7 +19,6 @@ import java.util.List;
 public final class EmployeeDAO extends GenericDAO<Employee> {
 
     private static final EmployeeDAO EMPLOYEE_DAO = new EmployeeDAO();
-
     @Override
     protected Class<Employee> getEntityClass() {
         return Employee.class;
@@ -33,7 +35,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
     }
 
     //Working
-    public static Employee getEmployeeById(int id) {
+    public static Employee getEmployeeById(long id) {
         return EMPLOYEE_DAO.getById(id);
     }
 
@@ -108,8 +110,45 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
         return numberOfEmployees;
     }
 
-    public static void ensureNotNull(Company company) {
-        if (company == null) {
+    public static boolean exists(Employee employee) throws IllegalArgumentException {
+        ensureNotNull(employee);
+
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            TypedQuery<Employee> query = session.createQuery("SELECT e.idEmployee FROM Employee e WHERE e.idEmployee =:id", Employee.class);
+            query.setParameter("id", employee.getIdEmployee());
+            return query.getSingleResult() != null;
+        } catch (NoResultException | NonUniqueObjectException e) {
+            return false;
+        }
+    }
+
+    public static boolean isHired(long idEmployee) {
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<Company> query = session.createQuery("SELECT e.companyByCompanyId FROM Employee e WHERE e.idEmployee =:id", Company.class);
+            query.setParameter("id", idEmployee);
+            return query.getSingleResult() != null;
+        } catch (NoResultException | NonUniqueObjectException e) {
+            return false;
+        }
+    }
+
+    public static void hireEmployee(Company tmpCompany, Employee employee) {
+        ensureNotNull(tmpCompany);
+        ensureNotNull(employee);
+
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            //first check is the Employee already hired if not then hire
+            if (!isHired(employee.getIdEmployee())) {
+                employee.setCompanyByCompanyId(tmpCompany);
+                session.update(employee);
+            }
+            transaction.commit();
+        }
+    }
+
+    public static <T> void ensureNotNull(T entity) {
+        if (entity == null) {
             throw new IllegalArgumentException();
         }
     }

@@ -53,10 +53,9 @@ public class CompanyMenu extends AbstractMenu {
     //  |  7.  List all buildings of a company               | DONE
     //  |  8.  List the count of all contracts of a company  | DONE
     //  |  9.  List the count of all employees of a company  | DONE
-    //  |  10. List the count of all buildings of a company  |
-    //  |  11. Print name of company                         |
-    //  |  12. Hire employee                                 |
-    //  |  13. Fire employee                                 |
+    //  |  10. List the count of all buildings of a company  | DONE
+    //  |  11. Hire employee                                 |
+    //  |  12. Fire employee                                 |
 
     @Override
     protected void handleInput(int num) {
@@ -344,7 +343,48 @@ public class CompanyMenu extends AbstractMenu {
     }
 
     private void hireEmployee() {
-        System.out.println("hireEmployee");
+        try {
+            System.out.print("Enter the company's {NAME} (space) {EMPLOYEE_ID} and then press (ENTER): ");
+
+            String[] input = userInput.nextLine().split(" ");
+            String name = parseName(input[0]);
+            long idEmployee = parseId(input[1]);
+
+            Company company = new Company(name);
+            Employee employee = new Employee(idEmployee);
+            if (CompanyDAO.exists(company) && EmployeeDAO.exists(employee)) {
+                Company companyDB = CompanyDAO.getCompanyByName(name);
+                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
+
+                if(EmployeeDAO.isHired(idEmployee)){
+                    throw new IllegalArgumentException("Employee is already hired");
+                }
+
+                Employee employeeDB = EmployeeDAO.getEmployeeById(idEmployee);
+                Employee tmpEmployee = new Employee(employeeDB);
+
+                EmployeeDAO.hireEmployee(tmpCompany, tmpEmployee);
+                System.out.println("\nEmployee (" + tmpEmployee.getFirstName() +" " + tmpEmployee.getLastName()+ ") hired successfully");
+
+            } else {
+                throw new IllegalArgumentException("Company or Employee does not exist");
+            }
+
+        } catch (NoSuchElementException | IllegalArgumentException | IndexOutOfBoundsException e) {
+            String errMessage = MenuErrStringContainer
+                    .getInstance()
+                    .convertToErrMessageBox(e.getMessage());
+
+            System.out.println(errMessage);
+        }
+    }
+
+    private long parseId(String id) {
+        try {
+            return Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("ID must be a number");
+        }
     }
 
     private void fireEmployee() {
