@@ -63,7 +63,7 @@ public final class CompanyDAO extends GenericDAO<Company> {
     //Working but PK must be the same
     public static void deleteCompany(Company company) {
         //fire all employees of this company and then delete the company
-        EmployeeDAO.deleteAllEmployeesByCompany(company);
+        EmployeeDAO.fireAllEmployeesByCompany(company);
 
         //delete the company
         COMPANY_DAO.delete(company);

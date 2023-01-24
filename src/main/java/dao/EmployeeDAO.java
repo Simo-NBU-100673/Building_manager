@@ -186,7 +186,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
         }
     }
 
-    public static void deleteAllEmployeesByCompany(Company company) {
+    public static void fireAllEmployeesByCompany(Company company) {
         ensureNotNull(company);
 
         try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
