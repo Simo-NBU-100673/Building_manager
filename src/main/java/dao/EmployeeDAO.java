@@ -77,7 +77,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
         }
 
         if(employees.isEmpty()){
-            throw new IllegalArgumentException("No contracts found");
+            throw new IllegalArgumentException("No employees found hired by this company");
         }
 
         return employees;
@@ -173,7 +173,9 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
             session.beginTransaction();
 
             Employee result = query.getSingleResult();
-            if (!result.getCompanyByCompanyId().equals(tmpCompany)){
+
+            //if null he does not work anywhere, if not null but other company we can not fire him from this company
+            if (result.getCompanyByCompanyId() == null || !result.getCompanyByCompanyId().equals(tmpCompany)){
                 throw new IllegalArgumentException("Can not fire employee who does not work in this company");
             }
 

@@ -46,284 +46,206 @@ public class CompanyMenu extends AbstractMenu {
 
     @Override
     protected void handleInput(int num) {
-        super.actions.get(num).run();
-    }
-
-    private void createNewCompany() {
         try {
-            System.out.print("Enter the company's NAME and press (ENTER): ");
-            Company company = getCompanyFromUserInput();
-            CompanyDAO.saveCompany(company);
+            super.actions.get(num).run();
 
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
+        } catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+            printErrMessage(e.getMessage());
         }
     }
 
-    private void editCompany() {
-        try {
-            System.out.print("Enter the company's NAME that you want to edit and press (ENTER): ");
-
-            Company company = getCompanyFromUserInput();
-
-            if (CompanyDAO.exists(company)) {
-                System.out.println("Company exists");
-                System.out.println("Enter the NEW name of the company and press (ENTER): ");
-                String newName = userInput.nextLine();
-
-                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
-                Company tmpCompany = new Company(companyDB.getIdCompany(), newName);
-
-                CompanyDAO.updateCompany(tmpCompany);
-
-            } else {
-                throw new IllegalArgumentException("Company does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+    private void createNewCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyDoesNotExist(company);
+        CompanyDAO.saveCompany(company);
     }
 
-    private void deleteCompany() {
-        try {
-            System.out.print("Enter the company's NAME that you want to DELETE and press (ENTER): ");
+    private void editCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME that you want to edit and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyExists(company);
 
-            Company company = getCompanyFromUserInput();
+        System.out.print("Enter the NEW name of the company and press (ENTER): ");
+        String newName = userInput.nextLine();
 
-            if (CompanyDAO.exists(company)) {
-                System.out.println("Company successfully deleted!");
+        Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+        companyDB.setName(newName);
 
-                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
-                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
-
-                CompanyDAO.deleteCompany(tmpCompany);
-
-            } else {
-                throw new IllegalArgumentException("Company does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+        CompanyDAO.updateCompany(companyDB);
     }
 
-    private void listAllCompanies() {
-        try {
-            List<Company> companies = CompanyDAO.getAllCompanies();
+    private void deleteCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME that you want to DELETE and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyExists(company);
 
-            System.out.println("\nList of all companies: ");
-            companies.forEach(System.out::println);
-
-        } catch (IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+        Company companyDB = CompanyDAO.getCompanyByName(company.getName());
+        CompanyDAO.deleteCompany(companyDB);
+        System.out.println("Company successfully deleted!");
     }
 
-    private void listAllContractsOfCompany() {
-        try {
-            System.out.print("Enter the company's NAME for which you want\nto see the contracts and press (ENTER): ");
+    private void listAllCompanies() throws IllegalArgumentException {
+        List<Company> companies = CompanyDAO.getAllCompanies();
 
-            Company company = getCompanyFromUserInput();
-
-            if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
-                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
-
-                List<Contract> contractsByCompany = ContractDAO.getContractsByCompany(tmpCompany);
-                contractsByCompany.forEach(System.out::println);
-
-            } else {
-                throw new IllegalArgumentException("Company does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+        System.out.println("\nList of all companies: ");
+        companies.forEach(System.out::println);
     }
 
-    private void listAllEmployeesOfCompany() {
-        try {
-            System.out.print("Enter the company's NAME for which you want\nto see the hired employees and press (ENTER): ");
+    private void listAllContractsOfCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME for which you want\nto see the CONTRACTS and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyExists(company);
 
-            Company company = getCompanyFromUserInput();
+        Company companyDB = CompanyDAO.getCompanyByName(company.getName());
 
-            if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
-                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
-
-                List<Employee> employeesByCompany = EmployeeDAO.getEmployeesByCompany(tmpCompany);
-                System.out.println("\nList of all employees: ");
-                employeesByCompany.forEach(System.out::println);
-
-            } else {
-                throw new IllegalArgumentException("Company does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+        List<Contract> contractsByCompany = ContractDAO.getContractsByCompany(companyDB);
+        contractsByCompany.forEach(System.out::println);
     }
 
-    private void listAllBuildingsOfCompany() {
-        try {
-            System.out.print("Enter the company's NAME for which you want\nto see the hired employees and press (ENTER): ");
+    private void listAllEmployeesOfCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME for which you want\nto see the hired EMPLOYEES and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyExists(company);
 
-            Company company = getCompanyFromUserInput();
+        Company companyDB = CompanyDAO.getCompanyByName(company.getName());
 
-            if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
-                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
-
-                List<Building> buildingsByCompany = ContractDAO.getBuildingsByCompany(tmpCompany);
-                System.out.println("\nList of all buildings: ");
-                buildingsByCompany.forEach(System.out::println);
-
-            } else {
-                throw new IllegalArgumentException("Company does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+        List<Employee> employeesByCompany = EmployeeDAO.getEmployeesByCompany(companyDB);
+        System.out.println("\nList of all employees: ");
+        employeesByCompany.forEach(System.out::println);
     }
 
-    private void listCountOfAllContractsOfCompany() {
-        try {
-            System.out.print("Enter the company's NAME for which you want\nto see the contracts COUNT and press (ENTER): ");
+    private void listAllBuildingsOfCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME for which you want\nto see managed BUILDINGS and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyExists(company);
 
-            Company company = getCompanyFromUserInput();
+        Company companyDB = CompanyDAO.getCompanyByName(company.getName());
 
-            if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
-                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
-
-                long countOfContractsOfCompany = ContractDAO.getCountOfContractsOfCompany(tmpCompany);
-                System.out.println("\nCount of contracts of Company (" + company.getName() + "): "+ countOfContractsOfCompany);
-
-            } else {
-                throw new IllegalArgumentException("Company does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+        List<Building> buildingsByCompany = ContractDAO.getBuildingsByCompany(companyDB);
+        System.out.println("\nList of all buildings: ");
+        buildingsByCompany.forEach(System.out::println);
     }
 
-    private void listCountOfAllEmployeesOfCompany() {
-        try {
-            System.out.print("Enter the company's NAME for which you want\nto see the hired employees COUNT and press (ENTER): ");
+    private void listCountOfAllContractsOfCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME for which you want\nto see the contracts COUNT and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyExists(company);
 
-            Company company = getCompanyFromUserInput();
+        Company companyDB = CompanyDAO.getCompanyByName(company.getName());
 
-            if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
-                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
-
-                long countOfEmployeesOfCompany = EmployeeDAO.getCountOfEmployeesOfCompany(tmpCompany);
-                System.out.println("\nCount of employees of Company (" + company.getName() + "): "+ countOfEmployeesOfCompany);
-
-            } else {
-                throw new IllegalArgumentException("Company does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+        long countOfContractsOfCompany = ContractDAO.getCountOfContractsOfCompany(companyDB);
+        System.out.println("\nCount of contracts of Company (" + company.getName() + "): " + countOfContractsOfCompany);
     }
 
-    private void listCountOfAllBuildingsOfCompany() {
-        try {
-            System.out.print("Enter the company's NAME for which you want\nto see the COUNT of theirs buildings and press (ENTER): ");
+    private void listCountOfAllEmployeesOfCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME for which you want\nto see the hired employees COUNT and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyExists(company);
 
-            Company company = getCompanyFromUserInput();
+        Company companyDB = CompanyDAO.getCompanyByName(company.getName());
 
-            if (CompanyDAO.exists(company)) {
-                Company companyDB = CompanyDAO.getCompanyByName(company.getName());
-                Company tmpCompany = new Company(companyDB.getIdCompany(), company.getName());
+        long countOfEmployeesOfCompany = EmployeeDAO.getCountOfEmployeesOfCompany(companyDB);
+        System.out.println("\nCount of employees of Company (" + company.getName() + "): " + countOfEmployeesOfCompany);
+    }
 
-                long countOfBuildingsOfCompany = BuildingDAO.getCountOfBuildingsOfCompany(tmpCompany);
-                System.out.println("\nCount of buildings of Company (" + company.getName() + "): "+ countOfBuildingsOfCompany);
+    private void listCountOfAllBuildingsOfCompany() throws IllegalArgumentException, NoSuchElementException {
+        System.out.print("Enter the company's NAME for which you want\nto see the COUNT of theirs buildings and press (ENTER): ");
+        Company company = getCompanyFromUserInput();
+        ensureCompanyExists(company);
 
-            } else {
-                throw new IllegalArgumentException("Company does not exist");
-            }
+        Company companyDB = CompanyDAO.getCompanyByName(company.getName());
 
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            printErrMessage(e);
-        }
+        long countOfBuildingsOfCompany = BuildingDAO.getCountOfBuildingsOfCompany(companyDB);
+        System.out.println("\nCount of buildings of Company (" + company.getName() + "): " + countOfBuildingsOfCompany);
     }
 
     private void hireEmployee() {
+        System.out.print("Enter the company's {NAME} (space) {EMPLOYEE_ID} and then press (ENTER): ");
+
+        String[] input = userInput.nextLine().split(" ");
+        String name = getCompanyNameFromUserInput(input);
+        long idEmployee = getEmployeeIdFromUserInput(input);
+
+        Company company = new Company(name);
+        ensureCompanyExists(company);
+
+        Employee employee = new Employee(idEmployee);
+        ensureEmployeeExists(employee);
+
+        Company companyDB = CompanyDAO.getCompanyByName(name);
+        Employee employeeDB = EmployeeDAO.getEmployeeById(idEmployee);
+
+        EmployeeDAO.hireEmployee(companyDB, employeeDB);
+        System.out.println("\nEmployee (" + employeeDB.getFirstName() + " " + employeeDB.getLastName() + ") hired successfully");
+    }
+
+    private void fireEmployee() {
+        System.out.print("Enter the company's {NAME} (space) {EMPLOYEE_ID} and then press (ENTER): ");
+
+        String[] input = userInput.nextLine().split(" ");
+        String name = getCompanyNameFromUserInput(input);
+        long idEmployee = getEmployeeIdFromUserInput(input);
+
+        Company company = new Company(name);
+        ensureCompanyExists(company);
+
+        Employee employee = new Employee(idEmployee);
+        ensureEmployeeExists(employee);
+
+        Company companyDB = CompanyDAO.getCompanyByName(name);
+        Employee employeeDB = EmployeeDAO.getEmployeeById(idEmployee);
+
+        EmployeeDAO.fireEmployee(companyDB, employeeDB);
+        System.out.println("\nEmployee (" + employeeDB.getFirstName() + " " + employeeDB.getLastName() + ") fired successfully");
+    }
+
+    private String getCompanyNameFromUserInput(String[] input) throws IllegalArgumentException {
+        String name;
+
         try {
-            System.out.print("Enter the company's {NAME} (space) {EMPLOYEE_ID} and then press (ENTER): ");
+            name = parseName(input[0]);
 
-            String[] input = userInput.nextLine().split(" ");
-            String name = parseName(input[0]);
-            long idEmployee = parseId(input[1]);
-
-            Company company = new Company(name);
-            Employee employee = new Employee(idEmployee);
-            if (CompanyDAO.exists(company) && EmployeeDAO.exists(employee)) {
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
-
-                Employee employeeDB = EmployeeDAO.getEmployeeById(idEmployee);
-                Employee tmpEmployee = new Employee(employeeDB);
-
-                EmployeeDAO.hireEmployee(tmpCompany, tmpEmployee);
-                System.out.println("\nEmployee (" + tmpEmployee.getFirstName() +" " + tmpEmployee.getLastName()+ ") hired successfully");
-
-            } else {
-                throw new IllegalArgumentException("Company or Employee does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException | IndexOutOfBoundsException e) {
-            printErrMessage(e);
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("No name of company passed", e);
         }
+
+        return name;
+    }
+
+    private String parseName(String input) {
+        if (input.isEmpty()) {
+            throw new IllegalArgumentException("Invalid name, enter a non-empty value");
+        }
+        return input;
+    }
+
+    private long getEmployeeIdFromUserInput(String[] input) throws IllegalArgumentException {
+        long idEmployee;
+
+        try {
+            idEmployee = parseId(input[1]);
+
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("No id of employee passed", e);
+        }
+
+        return idEmployee;
     }
 
     private long parseId(String id) {
         try {
             return Long.parseLong(id);
+
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("ID must be a number");
         }
     }
 
-    private void fireEmployee() {
-        try {
-            System.out.print("Enter the company's {NAME} (space) {EMPLOYEE_ID} and then press (ENTER): ");
-
-            String[] input = userInput.nextLine().split(" ");
-            String name = parseName(input[0]);
-            long idEmployee = parseId(input[1]);
-
-            Company company = new Company(name);
-            Employee employee = new Employee(idEmployee);
-            if (CompanyDAO.exists(company) && EmployeeDAO.exists(employee)) {
-                Company companyDB = CompanyDAO.getCompanyByName(name);
-                Company tmpCompany = new Company(companyDB.getIdCompany(), name);
-
-                Employee employeeDB = EmployeeDAO.getEmployeeById(idEmployee);
-                Employee tmpEmployee = new Employee(employeeDB);
-
-                EmployeeDAO.fireEmployee(tmpCompany, tmpEmployee);
-                System.out.println("\nEmployee (" + tmpEmployee.getFirstName() +" " + tmpEmployee.getLastName()+ ") fired successfully");
-
-            } else {
-                throw new IllegalArgumentException("Company or Employee does not exist");
-            }
-
-        } catch (NoSuchElementException | IllegalArgumentException | IndexOutOfBoundsException e) {
-            printErrMessage(e);
-        }
-    }
-
-    private void printErrMessage(RuntimeException e){
+    private void printErrMessage(String message) {
         String errMessage = MenuErrStringContainer
                 .getInstance()
-                .convertToErrMessageBox(e.getMessage());
+                .convertToErrMessageBox(message);
 
         System.out.println(errMessage);
     }
@@ -336,11 +258,23 @@ public class CompanyMenu extends AbstractMenu {
         return company;
     }
 
-    private String parseName(String input) {
-        if (input.isEmpty()) {
-            throw new IllegalArgumentException("Invalid name, enter a non-empty value");
+    private void ensureCompanyExists(Company company) throws IllegalArgumentException {
+        if (!CompanyDAO.exists(company)) {
+            throw new IllegalArgumentException("Company does not exist");
         }
-        return input;
     }
+
+    private void ensureCompanyDoesNotExist(Company company) throws IllegalArgumentException {
+        if (CompanyDAO.exists(company)) {
+            throw new IllegalArgumentException("Company already exists");
+        }
+    }
+
+    private void ensureEmployeeExists(Employee employee) throws IllegalArgumentException {
+        if (!EmployeeDAO.exists(employee)) {
+            throw new IllegalArgumentException("Employee does not exist");
+        }
+    }
+
 
 }

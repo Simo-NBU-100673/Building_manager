@@ -64,7 +64,7 @@ public class ContractDAO extends GenericDAO<Contract>{
         }
 
         if(buildings.isEmpty()){
-            throw new IllegalArgumentException("No contracts found");
+            throw new IllegalArgumentException("No buildings found");
         }
 
         return buildings;
