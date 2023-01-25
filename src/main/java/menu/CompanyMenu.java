@@ -24,9 +24,7 @@ public class CompanyMenu extends AbstractMenu {
     }
 
     @Override
-    protected Map<Integer, Runnable> populateActionsMap() {
-        Map<Integer, Runnable> actions = new HashMap<>();
-
+    protected void populateActionsMap(Map<Integer, Runnable> actions) {
         // Populate commands map
         actions.put(1, this::createNewCompany);
         actions.put(2, this::editCompany);
@@ -40,8 +38,6 @@ public class CompanyMenu extends AbstractMenu {
         actions.put(10, this::listCountOfAllBuildingsOfCompany);
         actions.put(11, this::hireEmployee);
         actions.put(12, this::fireEmployee);
-
-        return actions;
     }
 
     @Override

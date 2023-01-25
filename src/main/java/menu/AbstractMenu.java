@@ -19,8 +19,9 @@ public abstract class AbstractMenu implements Menu, Comparable<AbstractMenu> {
     public AbstractMenu() {
         this.lengthOfMenu = calculateLengthOfMenu();
         this.menuString = MenuStringContainer.getInstance().getMenu(getMenuNumber());
-        actions = populateActionsMap();
+        actions = new HashMap<>();
         userInput = new Scanner(System.in);
+        populateActionsMap(actions);
     }
 
     public int calculateLengthOfMenu() {
@@ -100,7 +101,7 @@ public abstract class AbstractMenu implements Menu, Comparable<AbstractMenu> {
 
     protected abstract int getMenuNumber();
 
-    protected abstract Map<Integer, Runnable> populateActionsMap();
+    protected abstract void populateActionsMap(Map<Integer, Runnable> actions);
 
     @Override
     public int compareTo(AbstractMenu o) {

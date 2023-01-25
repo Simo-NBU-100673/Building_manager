@@ -12,8 +12,7 @@ public class ApartmentMenu extends AbstractMenu {
     }
 
     @Override
-    protected Map<Integer, Runnable> populateActionsMap() {
-        return null;
+    protected void populateActionsMap(Map<Integer, Runnable> actions) {
     }
 
     @Override
