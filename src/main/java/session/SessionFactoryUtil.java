@@ -8,9 +8,7 @@ import org.hibernate.service.ServiceRegistry;
 
 public class SessionFactoryUtil {
     //TODO somehow this must be gotten in runtime from maybe ENV variable
-//    public static boolean isTest = false;
-//    private static String config = (isTest)?"test.hibernate.cfg.xml":"hibernate.cfg.xml";
-
+    //"test.hibernate.cfg.xml" : "hibernate.cfg.xml"
     private static SessionFactory sessionFactory;
 
     public static SessionFactory getSessionFactory() {
