@@ -2,15 +2,17 @@
   |            [Operations with Building]              |
   |====================================================|
   |  1.  Create a new building                         |
-  |  2.  Edit a building                               |
-  |  3.  Delete a building                             |
-  |  4.  List all apartments in the building           |
-  |  5.  List all contracts of a company               |
-  |  6.  List all employees of a company               |
-  |  7.  List all buildings of a company               |
-  |  8.  List the count of all contracts of a company  |
-  |  9.  List the count of all employees of a company  |
-  |  10. List the count of all buildings of a company  |
+  |  2.  Edit a building name                          |
+  |  3.  Edit a building address                       |
+  |  4.  Delete a building                             |
+  |  5.  List all apartments in the building           |
+  |  6.  List all apartments by floor in building      |
+  |  7.  List all apartments by building and floor     |
+  |  8.  Print all fees combined for whole building    |
+  |  9.  Print all fees per every building by every    |
+  |      company                                       |
+  |  10.  Print names and id of employee which manages |
+  |      building by ****                              |
   |  11. Print address of building                     |
   |  12. Print name of building                        |
   |  13. Assign new tax                                |
