@@ -1,5 +1,0 @@
-  |=================[INVALID INPUT]====================|
-  |               Input can only be:                   |
-  |             { number from (1 - %d) }               |
-  |              { next, back or exit }                |
-  |=====================[ERROR]========================|
