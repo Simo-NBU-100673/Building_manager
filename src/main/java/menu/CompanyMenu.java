@@ -50,7 +50,7 @@ public class CompanyMenu extends AbstractMenu {
         }
     }
 
-    private void createNewCompany() throws IllegalArgumentException, NoSuchElementException {
+    public void createNewCompany() throws IllegalArgumentException, NoSuchElementException {
         System.out.print("Enter the company's NAME and press (ENTER): ");
         Company company = getCompanyFromUserInput();
         ensureCompanyDoesNotExist(company);

@@ -24,6 +24,7 @@ public class UserInterface {
     }
 
     public static UserInterface getInstance() {
+        System.setProperty("test.env", "false");
         UserInterface result = instance;
         if (result != null) {
             return result;

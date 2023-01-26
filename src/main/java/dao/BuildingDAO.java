@@ -37,6 +37,8 @@ public class BuildingDAO extends GenericDAO<Building>{
             transaction.commit();
         }catch (NoResultException | NonUniqueResultException e){
             throw new IllegalArgumentException(e);
+        }catch (IllegalStateException e){
+            throw new IllegalArgumentException("Not fully created object passed",e);
         }
 
         return countOfBuildings;

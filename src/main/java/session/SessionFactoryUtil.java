@@ -7,15 +7,14 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 public class SessionFactoryUtil {
-    //TODO somehow this must be gotten in runtime from maybe ENV variable
-    //"test.hibernate.cfg.xml" : "hibernate.cfg.xml"
     private static SessionFactory sessionFactory;
 
     public static SessionFactory getSessionFactory() {
         try {
             if (sessionFactory == null) {
                 Configuration configuration = new Configuration();
-                configuration.configure("hibernate.cfg.xml");
+                configuration.setProperty("hibernate.connection.url",getUrl());
+                configuration.setProperty("hibernate.hbm2ddl.auto",getConfig());
                 configuration.addAnnotatedClass(Apartment.class);
                 configuration.addAnnotatedClass(Building.class);
                 configuration.addAnnotatedClass(Company.class);
@@ -27,6 +26,8 @@ public class SessionFactoryUtil {
                 configuration.addAnnotatedClass(Resident.class);
                 configuration.addAnnotatedClass(Tax.class);
 //            configuration.addAnnotatedClass(TaxPK.class);
+
+                System.out.println(configuration.getProperties());
 
                 ServiceRegistry serviceRegistry
                         = new StandardServiceRegistryBuilder()
@@ -40,5 +41,26 @@ public class SessionFactoryUtil {
         }
 
         return sessionFactory;
+    }
+
+    //GETS THE CONFIG FOR HIBERNATE ACCORDING TO THE ENVIRONMENT VARIABLE (TEST OR PROD)
+    public static String getUrl(){
+        String configFile = "jdbc:mysql://localhost:33061/mydb";
+
+        if (System.getProperty("test.env").equals("true")) {
+            configFile = "jdbc:mysql://localhost:33061/mydb_test";
+        }
+
+        return configFile;
+    }
+
+    public static String getConfig(){
+        String config = "update";
+
+        if (System.getProperty("test.env").equals("true")) {
+            config = "create-drop";
+        }
+
+        return config;
     }
 }

@@ -3,6 +3,7 @@ package dao;
 import entity.Company;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -46,7 +47,7 @@ public final class CompanyDAO extends GenericDAO<Company> {
                     .createQuery("SELECT a FROM Company a ORDER BY a.idCompany ASC ", Company.class)
                     .getResultList();
 
-            if (companies.isEmpty()){
+            if (companies.isEmpty()) {
                 throw new IllegalArgumentException("No companies found");
             }
 
@@ -59,7 +60,12 @@ public final class CompanyDAO extends GenericDAO<Company> {
 
     //Working but PK must be the same
     public static void updateCompany(Company company) {
-        COMPANY_DAO.update(company);
+        try {
+            COMPANY_DAO.update(company);
+
+        } catch (OptimisticLockException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     //Working but PK must be the same
@@ -67,8 +73,13 @@ public final class CompanyDAO extends GenericDAO<Company> {
         //fire all employees of this company and then delete the company
         EmployeeDAO.fireAllEmployeesByCompany(company);
 
-        //delete the company
-        COMPANY_DAO.delete(company);
+        try {
+            //delete company
+            COMPANY_DAO.delete(company);
+
+        }catch (OptimisticLockException e){
+            throw new IllegalArgumentException(e);
+        }
     }
 
     //Working
@@ -91,7 +102,7 @@ public final class CompanyDAO extends GenericDAO<Company> {
 
             transaction.commit();
 //            session.evict(company);
-        }catch (NoResultException | NonUniqueResultException e){
+        } catch (NoResultException | NonUniqueResultException e) {
             throw new IllegalArgumentException(e);
         }
 
@@ -110,7 +121,7 @@ public final class CompanyDAO extends GenericDAO<Company> {
         }
     }
 
-    public static<T> void ensureNotNull(T company) {
+    public static <T> void ensureNotNull(T company) {
         if (company == null) {
             throw new IllegalArgumentException();
         }
