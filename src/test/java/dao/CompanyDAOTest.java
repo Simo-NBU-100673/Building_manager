@@ -2,6 +2,7 @@ package dao;
 
 import entity.Company;
 import entity.Employee;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.OptimisticLockException;
 import org.hibernate.Session;
 import org.hibernate.dialect.lock.OptimisticEntityLockException;
@@ -261,24 +262,34 @@ class CompanyDAOTest {
 
         //check if the company and employee are in the DB
         session.beginTransaction();
+        //get all the companies from the DB
         Company companyFromDB = session.get(Company.class, company.getIdCompany());
         Employee employeeFromDB = session.get(Employee.class, employee.getIdEmployee());
         session.getTransaction().commit();
 
+        //check if the company and employee are already exist
         assertNotNull(companyFromDB);
         assertNotNull(employeeFromDB);
+        assertNotNull(employeeFromDB.getCompanyByCompanyId());
 
-        CompanyDAO.deleteCompany(company);
+        //delete the company
+        CompanyDAO.deleteCompany(companyFromDB);
 
-        //check if the company and employee are in the DB
+        //check if the company id deleted and employee have null company
         session.beginTransaction();
-        Company companyFromDBAfterDelete = session.get(Company.class, company.getIdCompany());
-        Employee employeeFromDBAfterDelete = session.get(Employee.class, employee.getIdEmployee());
+        assertThrows(NoResultException.class, () -> {session
+                .createQuery("SELECT c FROM Company c WHERE c.idCompany=:idCompany", Company.class)
+                .setParameter("idCompany", company.getIdCompany())
+                .getSingleResult();
+        });
         session.getTransaction().commit();
 
-        //? BUG IN TEST - employee and company are not deleted for some reason! (CODE IS WORKING IN PRODUCTION)
-        assertNull(companyFromDBAfterDelete);
-        assertNull(employeeFromDBAfterDelete);
+        //check if the employee is deleted
+        session.beginTransaction();
+        session.refresh(employeeFromDB);
+        session.getTransaction().commit();
+
+        assertNull(employeeFromDB.getCompanyByCompanyId());
     }
 
     @Test
