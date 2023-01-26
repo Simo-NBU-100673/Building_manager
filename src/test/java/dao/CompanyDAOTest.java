@@ -7,6 +7,8 @@ import jakarta.persistence.OptimisticLockException;
 import org.hibernate.Session;
 import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import session.SessionFactoryUtil;
 
 import java.util.List;
@@ -49,7 +51,7 @@ class CompanyDAOTest {
         session.getTransaction().commit();
 
         //They are compared by id if they are equal even that the names are different
-        //?THIS MUST THROW EXCEPTION BUT IT DOESN'T FOR NOW (BUG)
+        //?THIS MUST THROW EXCEPTION BUT IT DOESN'T FOR NOW (BUG) because the method exists compares them by id this is a very nice exception
         Company company = new Company(1, "Diff name");
         assertThrows(IllegalArgumentException.class, () -> CompanyDAO.saveCompany(company));
     }
@@ -239,7 +241,7 @@ class CompanyDAOTest {
     @Test
     void deleteCompanyNull() {
         Company company = null;
-        //! This is side effect of trying to fire first all employees
+        //This is side effect of trying to fire first all employees
         assertThrows(IllegalArgumentException.class, () -> CompanyDAO.deleteCompany(company));
     }
 
@@ -268,8 +270,8 @@ class CompanyDAOTest {
         session.getTransaction().commit();
 
         //check if the company and employee are already exist
-        assertNotNull(companyFromDB);
-        assertNotNull(employeeFromDB);
+        assertEquals(company, companyFromDB);
+        assertEquals(employee, employeeFromDB);
         assertNotNull(employeeFromDB.getCompanyByCompanyId());
 
         //delete the company
@@ -293,22 +295,80 @@ class CompanyDAOTest {
     }
 
     @Test
-    void deleteCompanyById() {
-        fail("Not yet implemented");
+    void deleteCompanyByIdExistingCompany() {
+        Company company = new Company("TEST NO EXISTING NAME");
+        session.beginTransaction();
+        session.save(company);
+        session.getTransaction().commit();
+
+        //check if the company is in the DB
+        session.beginTransaction();
+        Company companyFromDB = session.get(Company.class, company.getIdCompany());
+        session.getTransaction().commit();
+        assertEquals(company, companyFromDB);
+
+        CompanyDAO.deleteCompanyById(company.getIdCompany());
+
+        session.beginTransaction();
+        //get all the companies from the DB
+        assertThrows(NoResultException.class, () -> {session
+                .createQuery("SELECT c FROM Company c WHERE c.idCompany=:idCompany", Company.class)
+                .setParameter("idCompany", company.getIdCompany())
+                .getSingleResult();
+        });
+        session.getTransaction().commit();
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0,Integer.MAX_VALUE, Integer.MIN_VALUE})
+    void deleteCompanyById(int id) {
+        Company company = new Company(id,"TEST NO EXISTING NAME");
+        assertThrows(IllegalArgumentException.class, () -> CompanyDAO.deleteCompanyById(company.getIdCompany()));
     }
 
     @Test
-    void getCompanyByName() {
-        fail("Not yet implemented");
+    void getCompanyByNameExistingCompany() {
+        Company company = new Company("TEST NO EXISTING NAME");
+        session.beginTransaction();
+        session.save(company);
+        session.getTransaction().commit();
+
+        Company companyFromDB = CompanyDAO.getCompanyByName(company.getName());
+
+        assertEquals(company, companyFromDB);
     }
 
     @Test
-    void exists() {
-        fail("Not yet implemented");
+    void getCompanyByNameNonExistingCompany() {
+        Company company = new Company("TEST NO EXISTING NAME");
+        assertThrows(IllegalArgumentException.class, () -> CompanyDAO.getCompanyByName(company.getName()));
     }
 
     @Test
-    void ensureNotNull() {
-        fail("Not yet implemented");
+    void getCompanyByNameNullCompany() {
+        String name = null;
+        assertThrows(IllegalArgumentException.class, () -> CompanyDAO.getCompanyByName(name));
+    }
+
+    @Test
+    void existsWithExistingCompany() {
+        Company company = new Company("TEST NO EXISTING NAME");
+        session.beginTransaction();
+        session.save(company);
+        session.getTransaction().commit();
+
+        assertTrue(CompanyDAO.exists(company));
+    }
+
+    @Test
+    void existsWithNotExistingCompany() {
+        Company company = new Company("TEST NO EXISTING NAME");
+        assertFalse(CompanyDAO.exists(company));
+    }
+
+    @Test
+    void existsWithCompanyNull() {
+        Company company = null;
+        assertThrows(IllegalArgumentException.class,()->CompanyDAO.exists(company));
     }
 }
