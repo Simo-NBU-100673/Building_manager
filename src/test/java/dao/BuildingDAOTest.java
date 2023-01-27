@@ -17,6 +17,8 @@ public class BuildingDAOTest {
     public static void init() {
         //Make the session to be opened to the test environment DB
         System.setProperty("test.env", "true");
+        //! speed up the tests by loading the session factory before the tests to map the entities
+        SessionFactoryUtil.getSessionFactory();
     }
 
     @BeforeEach
