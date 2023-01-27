@@ -3,7 +3,6 @@ package entity;
 import jakarta.persistence.*;
 
 import java.util.Collection;
-import java.util.Objects;
 
 @Entity
 public class Building {
@@ -23,6 +22,22 @@ public class Building {
     private Contract contractByIdBuilding;
     @OneToMany(mappedBy = "buildingByBuildingId")
     private Collection<Tax> taxesByIdBuilding;
+
+    public Building() {
+        this.address = "No address";
+        this.name = "No name";
+    }
+
+    public Building(String address, String name) {
+        this.address = address;
+        this.name = name;
+    }
+
+    public Building(long idBuilding, String address, String name) {
+        this.idBuilding = idBuilding;
+        this.address = address;
+        this.name = name;
+    }
 
     @Override
     public String toString() {

@@ -3,7 +3,6 @@ package entity;
 import jakarta.persistence.*;
 
 import java.util.Collection;
-import java.util.Objects;
 
 @Entity
 public class Employee {
@@ -32,6 +31,11 @@ public class Employee {
         this.idEmployee = idEmployee;
         this.firstName = "No name";
         this.lastName = "No name";
+    }
+
+    public Employee(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public Employee(long idEmployee, String firstName, String lastName) {
