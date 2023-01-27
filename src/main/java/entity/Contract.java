@@ -39,6 +39,19 @@ public class Contract {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Contract contract = (Contract) o;
+        return Objects.equals(buildingByBuildingId, contract.buildingByBuildingId) && Objects.equals(employeeByEmployeeId, contract.employeeByEmployeeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(buildingByBuildingId, employeeByEmployeeId);
+    }
+
+    @Override
     public String toString() {
         return "Contract{" +
                 "Building=" + buildingByBuildingId +

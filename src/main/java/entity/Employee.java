@@ -3,6 +3,7 @@ package entity;
 import jakarta.persistence.*;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Entity
 public class Employee {
@@ -90,6 +91,19 @@ public class Employee {
 
     public void setContractsByIdEmployee(Collection<Contract> contractsByIdEmployee) {
         this.contractsByIdEmployee = contractsByIdEmployee;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Employee employee = (Employee) o;
+        return idEmployee == employee.idEmployee && Objects.equals(firstName, employee.firstName) && Objects.equals(lastName, employee.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idEmployee, firstName, lastName);
     }
 
     @Override

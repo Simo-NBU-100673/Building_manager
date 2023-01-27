@@ -3,6 +3,7 @@ package entity;
 import jakarta.persistence.*;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Entity
 public class Building {
@@ -37,6 +38,19 @@ public class Building {
         this.idBuilding = idBuilding;
         this.address = address;
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Building building = (Building) o;
+        return idBuilding == building.idBuilding && Objects.equals(address, building.address) && Objects.equals(name, building.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idBuilding, address, name);
     }
 
     @Override
