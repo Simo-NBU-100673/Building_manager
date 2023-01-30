@@ -96,10 +96,8 @@ class EmployeeDAOTest {
         assertEquals(employee, fromDB);
     }
 
-//? THIS METHOD MUST CHECK IF THE EMPLOYEE IS LINKED TO A COMPANY AND CONTRACT
     @Test
     void deleteEmployee() {
-        fail("Must check if the employee is linked to a company and contract");
         Employee employee = new Employee("Simeon", "Popov");
         saveToDataBase(session, employee);
 
@@ -111,11 +109,19 @@ class EmployeeDAOTest {
                 .getResultList();
         session.getTransaction().commit();
 
+        //check if there is any contract with the deleted employee
+        session.beginTransaction();
+        List <Employee> fromDB2 = session.createQuery("SELECT c FROM Contract c WHERE c.employeeByEmployeeId = :employee", Employee.class)
+                .setParameter("employee", employee)
+                .getResultList();
+        session.getTransaction().commit();
+
         assertTrue(fromDB.isEmpty());
+        assertTrue(fromDB2.isEmpty());
     }
 
 
-    //?         FROM HERE ARE THE USED NOT GENERIC METHODS
+    //!         FROM HERE ARE THE USED NOT GENERIC METHODS
     @Test
     void getEmployeesByCompanyHaveHiredEmployees() {
         //1. Employees are at least 1 = List<Employee>

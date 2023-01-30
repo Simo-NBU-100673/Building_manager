@@ -330,21 +330,21 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
     }
 
     public static Map<Employee, Collection<Building>> getBuildingsForEmployee() {
-        Map<Employee, Collection<Building>> result = new HashMap<>();
+        Map<Employee, Collection<Building>> employeeBuildings  = new HashMap<>();
 
         try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
-            List<Object[]> queryResult = session.createQuery("SELECT c.employeeByEmployeeId, b FROM Contract c JOIN c.buildingByBuildingId b").getResultList();
-
-            for (Object[] objects : queryResult) {
-                Employee employee = (Employee) objects[0];
-                Building building = (Building) objects[1];
-
-                Collection<Building> buildings = result.computeIfAbsent(employee, k -> new ArrayList<>());
+            String hql = "SELECT c.employeeByEmployeeId, c.buildingByBuildingId FROM Contract c";
+            List<Object[]> results = session.createQuery(hql).getResultList();
+            for (Object[] result : results) {
+                Employee employee = (Employee) result[0];
+                Building building = (Building) result[1];
+                Collection<Building> buildings = employeeBuildings.getOrDefault(employee, new ArrayList<>());
                 buildings.add(building);
+                employeeBuildings.put(employee, buildings);
             }
         }
 
-        return result;
+        return employeeBuildings ;
     }
 
     public static <T> void ensureNotNull(T entity) {
