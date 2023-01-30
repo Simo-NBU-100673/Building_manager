@@ -6,6 +6,8 @@ import org.hibernate.Session;
 import org.junit.jupiter.api.*;
 import session.SessionFactoryUtil;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EmployeeDAOTest {
@@ -43,37 +45,71 @@ class EmployeeDAOTest {
 
     @Test
     void saveEmployee() {
-//        fail("Not yet implemented");
-    }
+        Employee employee = new Employee("Simeon", "Popov");
+        EmployeeDAO.saveEmployee(employee);
 
-    @Test
-    void testSaveEmployee() {
-//        fail("Not yet implemented");
+        refreshEntity(session, employee);
+
+        assertEquals(employee, EmployeeDAO.getEmployeeById(employee.getIdEmployee()));
     }
 
     @Test
     void getEmployeeById() {
-//        fail("Not yet implemented");
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+
+        session.beginTransaction();
+        Employee fromDB = session.get(Employee.class, employee.getIdEmployee());
+        session.getTransaction().commit();
+
+        assertEquals(employee, fromDB);
     }
 
     @Test
     void getAllEmployees() {
-//        fail("Not yet implemented");
+        Employee employee1 = new Employee("Simeon", "Popov");
+        Employee employee2 = new Employee("Simeon2", "Popov2");
+        saveToDataBase(session, employee1);
+        saveToDataBase(session, employee2);
+
+        List<Employee> employees = List.of(employee1, employee2);
+        List<Employee> employeesFromDB = EmployeeDAO.getAllEmployees().stream().toList();
+
+        assertEquals(employees, employeesFromDB);
     }
 
     @Test
     void updateEmployee() {
-//        fail("Not yet implemented");
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+
+        employee.setFirstName("Simeon2");
+        employee.setLastName("Popov2");
+        EmployeeDAO.updateEmployee(employee);
+
+        refreshEntity(session, employee);
+
+        session.beginTransaction();
+        Employee fromDB = session.get(Employee.class, employee.getIdEmployee());
+        session.getTransaction().commit();
+
+        assertEquals(employee, fromDB);
     }
 
     @Test
     void deleteEmployee() {
-//        fail("Not yet implemented");
-    }
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
 
-    @Test
-    void deleteEmployeeById() {
-//        fail("Not yet implemented");
+        EmployeeDAO.deleteEmployee(employee);
+
+        session.beginTransaction();
+        List <Employee> fromDB = session.createQuery("FROM Employee WHERE idEmployee = :id", Employee.class)
+                .setParameter("id", employee.getIdEmployee())
+                .getResultList();
+        session.getTransaction().commit();
+
+        assertTrue(fromDB.isEmpty());
     }
 
 
@@ -81,126 +117,270 @@ class EmployeeDAOTest {
     @Test
     void getEmployeesByCompanyHaveHiredEmployees() {
         //1. Employees are at least 1 = List<Employee>
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+        linkEmployeeToCompany(session, employee, company);
+
+        assertEquals(1, EmployeeDAO.getEmployeesByCompany(company).size());
+        assertEquals(employee, EmployeeDAO.getEmployeesByCompany(company).get(0));
     }
 
     @Test
     void getEmployeesByCompanyNoHiredEmployees() {
         //2. Employees 0 = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.getEmployeesByCompany(company));
     }
 
     @Test
     void getEmployeesByCompanyNullCompany() {
         //3. Company is null = IllegalArgumentException
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.getEmployeesByCompany(null));
     }
 
     @Test
     void getCountOfEmployeesOfCompanyHaveHiredEmployees() {
         //1. Employees are at least 1 = long
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+        linkEmployeeToCompany(session, employee, company);
+
+        assertEquals(1, EmployeeDAO.getCountOfEmployeesOfCompany(company));
     }
 
     @Test
     void getCountOfEmployeesOfCompanyNoHiredEmployees() {
         //2. Employees 0 = 0
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        assertEquals(0, EmployeeDAO.getCountOfEmployeesOfCompany(company));
     }
 
     @Test
     void getCountOfEmployeesOfCompanyNullCompany() {
         //3. Company is null = IllegalArgumentException
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.getCountOfEmployeesOfCompany(null));
     }
 
     @Test
     void existsTrue() {
         //1. Employee exists = true
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+        linkEmployeeToCompany(session, employee, company);
+
+        assertTrue(EmployeeDAO.exists(employee));
     }
 
     @Test
     void existsFalse() {
         //2. Employee doesn't exist = false
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+
+        assertFalse(EmployeeDAO.exists(employee));
     }
 
     @Test
     void existsNullEmployee() {
         //3. Employee is null = IllegalArgumentException
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.exists(null));
     }
 
     @Test
     void isHiredTrue() {
         //! This method uses id of the employee and equals for the company
         //1. Employee is hired = true
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+        linkEmployeeToCompany(session, employee, company);
+
+        assertTrue(EmployeeDAO.isHired(employee.getIdEmployee(), company));
     }
 
     @Test
     void isHiredFalse() {
         //! This method uses id of the employee and equals for the company
         //2. Employee is not hired = false
-    }
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
 
-    @Test
-    void isHiredNullEmployee() {
-        //! This method uses id of the employee and equals for the company
-        //3. Employee is null = IllegalArgumentException
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+        linkEmployeeToCompany(session, employee, company);
+
+        assertFalse(EmployeeDAO.isHired(employee.getIdEmployee()+1, company));
     }
 
     @Test
     void hireEmployeeSuccessfully() {
         //1. Employee is hired = employee.companyByCompanyId = company
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+
+        //check if employee.companyByCompanyId is null which means that the employee is not hired
+        assertNull(employee.getCompanyByCompanyId());
+
+        EmployeeDAO.hireEmployee(company, employee);
+
+        refreshEntity(session, employee);
+
+        assertEquals(company, employee.getCompanyByCompanyId());
     }
 
     @Test
     void hireEmployeeAlreadyHired() {
         //2. Employee is already hired = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+        linkEmployeeToCompany(session, employee, company);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.hireEmployee(company, employee));
     }
 
     @Test
     void hireEmployeeNullEmployee() {
         //3. Employee is null = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.hireEmployee(company, null));
     }
 
     @Test
     void hireEmployeeNullCompany() {
         //4. Company is null = IllegalArgumentException
+        Employee employee = new Employee("Simeon", "Popov");
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.hireEmployee(null, employee));
 
     }
 
     @Test
     void hireEmployeeNonExistingCompany() {
         //5. Company doesn't exist = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.hireEmployee(company, employee));
     }
 
     @Test
     void hireEmployeeNonExistingEmployee() {
         //6. Employee doesn't exist = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.hireEmployee(company, employee));
     }
 
     @Test
     void fireEmployeeSuccessfully() {
         //1. Employee is fired = employee.companyByCompanyId = null
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+        linkEmployeeToCompany(session, employee, company);
+
+        //check if employee.companyByCompanyId is null which means that the employee is not hired
+        assertNotNull(employee.getCompanyByCompanyId());
+
+        EmployeeDAO.fireEmployee(company, employee);
+
+        refreshEntity(session, employee);
+
+        assertNull(employee.getCompanyByCompanyId());
     }
 
     @Test
     void fireEmployeeNotHired() {
         //2. Employee is not hired = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+
+        assertNull(employee.getCompanyByCompanyId());
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.fireEmployee(company, employee));
     }
 
     @Test
     void fireEmployeeNullEmployee() {
         //3. Employee is null = IllegalArgumentException
+        Employee employee = new Employee("Simeon", "Popov");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.fireEmployee(null, employee));
     }
 
     @Test
     void fireEmployeeNullCompany() {
         //4. Company is null = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.fireEmployee(company, null));
 
     }
 
     @Test
     void fireEmployeeNonExistingCompany() {
         //5. Company doesn't exist = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+
+        Employee employee = new Employee("Simeon", "Popov");
+        saveToDataBase(session, employee);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.fireEmployee(company, employee));
     }
 
     @Test
     void fireEmployeeNonExistingEmployee() {
         //6. Employee doesn't exist = IllegalArgumentException
+        Company company = new Company(1, "SAP");
+        saveToDataBase(session, company);
+
+        Employee employee = new Employee("Simeon", "Popov");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EmployeeDAO.fireEmployee(company, employee));
     }
 
     @Test

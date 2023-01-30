@@ -4,6 +4,7 @@ import entity.Company;
 import entity.Employee;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
+import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
 import org.hibernate.NonUniqueObjectException;
 import org.hibernate.Session;
@@ -54,7 +55,7 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
     }
 
     //Working
-    public static void deleteEmployeeById(int id) {
+    public static void deleteEmployeeById(long id) {
         EMPLOYEE_DAO.deleteById(id);
     }
 
@@ -160,6 +161,8 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
 
         } catch (NoResultException | NonUniqueObjectException e) {
             throw new IllegalArgumentException(e);
+        } catch (PersistenceException e){
+            throw new IllegalArgumentException("No such company found!",e);
         }
     }
 

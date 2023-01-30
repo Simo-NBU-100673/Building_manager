@@ -53,7 +53,7 @@ class CompanyDAOTest {
         session.getTransaction().commit();
 
         //They are compared by id if they are equal even that the names are different
-        //?THIS MUST THROW EXCEPTION BUT IT DOESN'T FOR NOW (BUG) because the method exists compares them by id this is a very nice exception
+        //?THIS MUST THROW EXCEPTION BUT IT DOESN'T FOR NOW (BUG) because the method exists compares them by id this is a unique case exception
         Company company = new Company(1, "Diff name");
         assertThrows(IllegalArgumentException.class, () -> CompanyDAO.saveCompany(company));
     }
