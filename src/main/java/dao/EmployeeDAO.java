@@ -1,6 +1,8 @@
 package dao;
 
+import entity.Building;
 import entity.Company;
+import entity.Contract;
 import entity.Employee;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
@@ -12,13 +14,12 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import session.SessionFactoryUtil;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 //TODO make singleton with DLC
 public final class EmployeeDAO extends GenericDAO<Employee> {
 
-    private static final EmployeeDAO EMPLOYEE_DAO = new EmployeeDAO();
+    public static final EmployeeDAO EMPLOYEE_DAO = new EmployeeDAO();
     @Override
     protected Class<Employee> getEntityClass() {
         return Employee.class;
@@ -49,14 +50,67 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
         EMPLOYEE_DAO.update(employee);
     }
 
-    //Working but PK must be the same
+    //Working so far
     public static void deleteEmployee(Employee employee) {
-        EMPLOYEE_DAO.delete(employee);
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+
+            //get all contracts of the employee which will be deleted
+            session.beginTransaction();
+            List<Contract> contracts = session.createQuery("" +
+                            "select c " +
+                            "from Contract c " +
+                            "where c.employeeByEmployeeId = :employee",
+                            Contract.class)
+                    .setParameter("employee", employee)
+                    .getResultList();
+
+            session.getTransaction().commit();
+
+            for (Contract contract : contracts) {
+                //get employee with the least amount of contracts in the same company
+                session.beginTransaction();
+                Employee newEmployee = (Employee) session.createQuery("select e " +
+                                "from Employee e " +
+                                "where e.idEmployee != :employeeId " +
+                                "and e.companyByCompanyId = :company " +
+                                "order by (select count(c) from Contract c where c.employeeByEmployeeId = e) asc")
+                        .setParameter("employeeId", employee.getIdEmployee())
+                        .setParameter("company", employee.getCompanyByCompanyId())
+                        .setMaxResults(1)
+                        .uniqueResult();
+
+                session.getTransaction().commit();
+
+                //if there is no employee with the least amount of contracts in the same company, then delete the contract
+                if (newEmployee != null) {
+                    //update contract
+                    session.beginTransaction();
+                    contract.setEmployeeByEmployeeId(newEmployee);
+                    session.merge(contract);
+                    session.getTransaction().commit();
+
+                } else {
+                    //delete contract
+                    session.beginTransaction();
+                    session.remove(contract);
+                    session.getTransaction().commit();
+                }
+
+            }
+        }
+
+
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            session.beginTransaction();
+            session.remove(employee);
+            session.getTransaction().commit();
+
+        }
     }
 
-    //Working
     public static void deleteEmployeeById(long id) {
-        EMPLOYEE_DAO.deleteById(id);
+        Employee employee = getEmployeeById(id);
+        deleteEmployee(employee);
     }
 
     public static List<Employee> getEmployeesByCompany(Company company) {
@@ -211,6 +265,86 @@ public final class EmployeeDAO extends GenericDAO<Employee> {
         } catch (NoResultException | NonUniqueObjectException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public static boolean checkIfEmployeeWithSameNamesExists(Employee employee) {
+        ensureNotNull(employee);
+
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<Employee> query = session.createQuery("SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName =:lastName", Employee.class);
+            query.setParameter("firstName", employee.getFirstName());
+            query.setParameter("lastName", employee.getLastName());
+            session.beginTransaction();
+
+            Employee result = query.getSingleResult();
+//            session.evict(result);
+            return result != null;
+
+        } catch (NoResultException e) {
+            return false;
+        } catch (NonUniqueResultException e){
+            return true;
+        }
+    }
+
+    public static List<Employee> getAllEmployeesWithSameNames(Employee employee){
+        ensureNotNull(employee);
+
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<Employee> query = session.createQuery("SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName =:lastName", Employee.class);
+            query.setParameter("firstName", employee.getFirstName());
+            query.setParameter("lastName", employee.getLastName());
+            session.beginTransaction();
+
+            List<Employee> result = query.getResultList();
+            if(result.isEmpty()){
+                throw new IllegalArgumentException("No such employee found");
+            }
+
+//            session.evict(result);
+
+            return result;
+
+        } catch (NoResultException | IllegalArgumentException e) {
+            throw new IllegalArgumentException("No such employee found");
+        }
+    }
+
+    public Employee getEmployeeByNames(Employee employee){
+        ensureNotNull(employee);
+
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Query<Employee> query = session.createQuery("SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName =:lastName", Employee.class);
+            query.setParameter("firstName", employee.getFirstName());
+            query.setParameter("lastName", employee.getLastName());
+            session.beginTransaction();
+
+            Employee result = query.getSingleResult();
+            return result;
+
+        } catch (NoResultException e) {
+            throw new IllegalArgumentException("No such employee found");
+        } catch (NonUniqueResultException e){
+            throw new NonUniqueResultException("There are more employees with same name");
+        }
+    }
+
+    public static Map<Employee, Collection<Building>> getBuildingsForEmployee() {
+        Map<Employee, Collection<Building>> result = new HashMap<>();
+
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            List<Object[]> queryResult = session.createQuery("SELECT c.employeeByEmployeeId, b FROM Contract c JOIN c.buildingByBuildingId b").getResultList();
+
+            for (Object[] objects : queryResult) {
+                Employee employee = (Employee) objects[0];
+                Building building = (Building) objects[1];
+
+                Collection<Building> buildings = result.computeIfAbsent(employee, k -> new ArrayList<>());
+                buildings.add(building);
+            }
+        }
+
+        return result;
     }
 
     public static <T> void ensureNotNull(T entity) {

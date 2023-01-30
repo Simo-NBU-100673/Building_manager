@@ -96,8 +96,10 @@ class EmployeeDAOTest {
         assertEquals(employee, fromDB);
     }
 
+//? THIS METHOD MUST CHECK IF THE EMPLOYEE IS LINKED TO A COMPANY AND CONTRACT
     @Test
     void deleteEmployee() {
+        fail("Must check if the employee is linked to a company and contract");
         Employee employee = new Employee("Simeon", "Popov");
         saveToDataBase(session, employee);
 

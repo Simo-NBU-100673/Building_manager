@@ -5,7 +5,7 @@
   |  2.  Edit an employee                              |
   |  3.  Delete employee                               |
   |  4.  List all employees with managed buildings     |
-  |  5.  Print employee                                |
+  |  5.  Print all employees                           |
   |====================================================|
   |         (BACK)        [4/5]         (NEXT)         |
   |====================================================|

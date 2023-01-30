@@ -3,6 +3,7 @@ package dao;
 import entity.Building;
 import entity.Company;
 import entity.Contract;
+import entity.Employee;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
 import org.hibernate.Session;
@@ -11,7 +12,7 @@ import session.SessionFactoryUtil;
 
 import java.util.List;
 
-public class ContractDAO extends GenericDAO<Contract>{
+public class ContractDAO extends GenericDAO<Contract> {
     @Override
     protected Class<Contract> getEntityClass() {
         return Contract.class;
@@ -36,7 +37,7 @@ public class ContractDAO extends GenericDAO<Contract>{
             transaction.commit();
         }
 
-        if(contracts.isEmpty()){
+        if (contracts.isEmpty()) {
             throw new IllegalArgumentException("No contracts found");
         }
 
@@ -63,7 +64,7 @@ public class ContractDAO extends GenericDAO<Contract>{
             transaction.commit();
         }
 
-        if(buildings.isEmpty()){
+        if (buildings.isEmpty()) {
             throw new IllegalArgumentException("No buildings found");
         }
 
@@ -88,15 +89,15 @@ public class ContractDAO extends GenericDAO<Contract>{
                     .setParameter("company", company)
                     .getSingleResult();
             transaction.commit();
-        }catch (NoResultException | NonUniqueResultException e){
+        } catch (NoResultException | NonUniqueResultException e) {
             throw new IllegalArgumentException(e);
         }
 
         return numberOfContracts;
     }
 
-    public static void ensureNotNull(Company company) {
-        if (company == null) {
+    public static <T> void ensureNotNull(T object) {
+        if (object == null) {
             throw new IllegalArgumentException();
         }
     }
