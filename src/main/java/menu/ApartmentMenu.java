@@ -1,15 +1,19 @@
 package menu;
 
-import dao.ApartmentDAO;
-import dao.BuildingDAO;
-import dao.OwnerDAO;
-import entity.Apartment;
-import entity.Building;
-import entity.Owner;
+import dao.*;
+import entity.*;
 import menu.string.container.MenuErrStringContainer;
+import tax.type.TaxType;
 
-import java.util.Map;
-import java.util.Scanner;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ApartmentMenu extends AbstractMenu {
     private static final int menuNumber = 3;
@@ -37,16 +41,16 @@ public class ApartmentMenu extends AbstractMenu {
 
 
 
-    //  |  1.  Create a new apartment                        |
-    //  |  2.  Edit an apartment                             |
-    //  |  3.  Delete apartment                              |
-    //  |  4.  List all residents in the apartment           |
-    //  |  5.  Add resident                                  |
-    //  |  6.  Remove resident                               |
-    //  |  7.  Print floor of the apartment                  |
-    //  |  8.  List all pets living in the apartment         |
+    //  |  1.  Create a new apartment                        | DONE
+    //  |  2.  Edit an apartment                             | DONE
+    //  |  3.  Delete apartment                              | DONE
+    //  |  4.  List all residents in the apartment           | DONE
+    //  |  5.  Add resident                                  | DONE
+    //  |  6.  Remove resident                               | DONE
+    //  |  7.  Print floor of the apartment                  | DONE
+    //  |  8.  List all pets living in the apartment         | DONE
     //  |  9.  Print the taxes for the apartment             |
-    //  |  10. Print the owner of the apartment              |
+    //  |  10. Print the owner of the apartment              | DONE
     //  |  11. Print last date when taxes were paid          |
     //  |  12. Print all payments from apartment             |
     //  |  13. Pay taxes                                     |
@@ -144,43 +148,148 @@ public class ApartmentMenu extends AbstractMenu {
     }
 
     private void listAllResidentsInApartment() {
-
+        Apartment apartment = getApartmentByIdFromUser();
+        List<Resident> residents = ApartmentDAO.getResidentsInApartment(apartment).stream().toList();
+        System.out.println("Residents in apartment with id("+apartment.getIdApartment()+"):");
+        residents.forEach(System.out::println);
     }
 
     private void addResident() {
+        Resident resident = null;
+        try {
+            resident = getResidentFromUserInput();
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
 
+        Apartment apartment = getApartmentByIdFromUser();
+        resident.setApartmentByApartmentId(apartment);
+
+        ResidentDAO.saveResident(resident);
+    }
+
+    private Resident getResidentFromUserInput() throws ParseException {
+        System.out.println("Type for Resident: {first_name} {last_name} {yyyy-MM-dd} {isUsingElevator(true/false)} and press (ENTER)");
+        System.out.println("The date of birth must be in this format!");
+        String[] tokens = userInput.nextLine().split(" ");
+        String firstName = tokens[0];
+        String lastName = tokens[1];
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = format.parse(tokens[2]);
+        boolean isUsingElevator = tokens[3].trim().equalsIgnoreCase("true");
+        Resident resident = new Resident(new java.sql.Date(date.getTime()),firstName,isUsingElevator,lastName);
+
+        return resident;
     }
 
     private void removeResident() {
+        Resident resident = getResidentByIdFromUserInput();
+        ResidentDAO.deleteResident(resident);
+    }
 
+    private Resident getResidentByIdFromUserInput(){
+        System.out.println("Type the id of the resident you want to remove from its current apartment:");
+        long id = Long.parseLong(userInput.nextLine().trim());
+        if (!ResidentDAO.exists(id)) {
+            throw new IllegalArgumentException("Apartment with this ID does NOT exist!");
+        }
+
+        Resident resident = ResidentDAO.getResidentById(id);
+
+        return resident;
     }
 
     private void printFloorOfApartment() {
-
+        Apartment apartment = getApartmentByIdFromUser();
+        System.out.println("Floor of apartment: "+apartment.getFloor());
     }
 
     private void listAllPetsInApartment() {
-
+        Apartment apartment = getApartmentByIdFromUser();
+        List<Pet> pets = ApartmentDAO.getPetsInApartment(apartment);
+        System.out.println("Pets in apartment with id: "+apartment.getIdApartment());
+        pets.forEach(System.out::println);
     }
 
     private void printTaxesForApartment() {
+        Apartment apartment = getApartmentByIdFromUser();
+        Tax taxPeople = BuildingDAO.getTaxOfBuilding(apartment.getBuildingByBuildingId(), TaxType.PEOPLE);
+        int countOfPeopleInApartment = ApartmentDAO
+                .getResidentsInApartment(apartment)
+                .stream()
+                .filter(resident -> isBeforeSevenYears(resident.getDateOfBirth().toLocalDate()))
+                .filter(Resident::isUsingElevator)
+                .toList()
+                .size();
 
+        Tax taxPets = BuildingDAO.getTaxOfBuilding(apartment.getBuildingByBuildingId(), TaxType.PET);
+        int countOfPetsInApartment = ApartmentDAO.getPetsInApartment(apartment).size();
+
+        String message = String.format("Apartment with residents: %d and pets: %d",countOfPeopleInApartment, countOfPetsInApartment);
+        System.out.println(message);
+
+        String message2 = String.format("Taxes: "+taxPeople.getType().name()+"(%d), "+taxPets.getType().name()+"(%d)",taxPeople.getFee(), taxPets.getFee());
+        System.out.println(message2);
+
+        int sum = Math.toIntExact(((taxPeople.getFee() * countOfPeopleInApartment) + (taxPets.getFee() * countOfPetsInApartment)));
+
+        String message3 = String.format("SUM: "+ sum);
+        System.out.println(message3);
+    }
+
+    private int calculateTaxForApartment(Apartment apartment){
+        Tax taxPeople = BuildingDAO.getTaxOfBuilding(apartment.getBuildingByBuildingId(), TaxType.PEOPLE);
+        int countOfPeopleInApartment = ApartmentDAO
+                .getResidentsInApartment(apartment)
+                .stream()
+                .filter(resident -> isBeforeSevenYears(resident.getDateOfBirth().toLocalDate()))
+                .filter(Resident::isUsingElevator)
+                .toList()
+                .size();
+
+        Tax taxPets = BuildingDAO.getTaxOfBuilding(apartment.getBuildingByBuildingId(), TaxType.PET);
+        int countOfPetsInApartment = ApartmentDAO.getPetsInApartment(apartment).size();
+
+        int sum = Math.toIntExact(((taxPeople.getFee() * countOfPeopleInApartment) + (taxPets.getFee() * countOfPetsInApartment)));
+
+        return sum;
+    }
+
+    private static boolean isBeforeSevenYears(LocalDate date) {
+        LocalDate now = LocalDate.now();
+        Period period = Period.between(date, now);
+        return period.getYears() >= 7;
     }
 
     private void printOwnerOfApartment() {
-
+        Apartment apartment = getApartmentByIdFromUser();
+        System.out.println("Owner of apartment: "+apartment.getOwnerByOwnerId());
     }
 
     private void printLastPaidDate() {
+        Apartment apartment = getApartmentByIdFromUser();
+        Paymentshistory payment = PaymentHistoryDAO.getLastPayment(apartment);
 
+        System.out.println("Last payment: "+payment);
     }
 
     private void printAllPaymentsForApartment() {
+        Apartment apartment = getApartmentByIdFromUser();
+        List<Paymentshistory> payments = PaymentHistoryDAO.getAllPayments(apartment).stream().toList();
 
+        System.out.println("All payments for this apartment:");
+        payments.forEach(System.out::println);
     }
 
     private void payTaxes() {
+        Apartment apartment = getApartmentByIdFromUser();
+        int tax = calculateTaxForApartment(apartment);
+        java.util.Date currentDate = new java.util.Date();
 
+        Paymentshistory payment = new Paymentshistory(new java.sql.Date(currentDate.getTime()), tax);
+        payment.setApartmentByApartmentsId(apartment);
+
+        PaymentHistoryDAO.savePayment(payment);
     }
 
 }

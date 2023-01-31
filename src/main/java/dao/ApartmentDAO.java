@@ -1,6 +1,9 @@
 package dao;
 
 import entity.Apartment;
+import entity.Building;
+import entity.Pet;
+import entity.Resident;
 import org.hibernate.Session;
 import session.SessionFactoryUtil;
 
@@ -50,5 +53,59 @@ public class ApartmentDAO extends GenericDAO<Apartment>{
 
     public static void deleteApartment(Apartment apartment){
         APARTMENT_DAO.delete(apartment);
+    }
+
+    public static List<Resident> getResidentsInApartment(Apartment apartment){
+        ensureNotNull(apartment);
+
+        List<Resident> residents;
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+            String hql = "SELECT r FROM Resident r WHERE r.apartmentByApartmentId.idApartment = :id";
+            session.beginTransaction();
+            residents = session
+                    .createQuery(hql, Resident.class)
+                    .setParameter("id", apartment.getIdApartment())
+                    .getResultList();
+
+            session.getTransaction().commit();
+
+            if(residents.isEmpty()){
+                throw new IllegalArgumentException("No apartments in building");
+            }
+
+        }catch (Exception e){
+            throw new IllegalArgumentException(e);
+        }
+        return residents;
+    }
+
+    public static List<Pet> getPetsInApartment(Apartment apartment){
+        ensureNotNull(apartment);
+
+        List<Pet> pets;
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+            String hql = "SELECT p FROM Pet p WHERE p.apartmentByApartmentId.idApartment = :id";
+            session.beginTransaction();
+            pets = session
+                    .createQuery(hql, Pet.class)
+                    .setParameter("id", apartment.getIdApartment())
+                    .getResultList();
+
+            session.getTransaction().commit();
+
+            if(pets.isEmpty()){
+                throw new IllegalArgumentException("No apartments in building");
+            }
+
+        }catch (Exception e){
+            throw new IllegalArgumentException(e);
+        }
+        return pets;
+    }
+
+    public static <T> void ensureNotNull(T company) {
+        if (company == null) {
+            throw new IllegalArgumentException();
+        }
     }
 }
