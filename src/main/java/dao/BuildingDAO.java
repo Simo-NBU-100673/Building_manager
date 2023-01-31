@@ -6,7 +6,10 @@ import jakarta.persistence.NonUniqueResultException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import session.SessionFactoryUtil;
+import tax.type.TaxType;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 public class BuildingDAO extends GenericDAO<Building>{
@@ -200,6 +203,94 @@ public class BuildingDAO extends GenericDAO<Building>{
     public static void deleteBuilding(Building building){
         BUILDING_DAO.delete(building);
     }
+
+    public static long getCountOfPeopleInBuilding(Building building){
+        ensureNotNull(building);
+
+        Date sevenYearsAgo = Date.from(LocalDate.now().minusYears(7).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        long countOfPeopleInBuilding;
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            //gets all contracts where Employee works in the company which was given
+            countOfPeopleInBuilding = session
+                    .createQuery("" +
+                            "SELECT COUNT(a) " +
+                            "FROM Apartment a " +
+                            "INNER JOIN a.residentsByIdApartment r " +
+                            "WHERE a.buildingByBuildingId.idBuilding = :id " +
+                            "AND r.isUsingElevator = TRUE " +
+                            "AND r.dateOfBirth < :date" +
+                            "", Long.class)
+                    .setParameter("id", building.getIdBuilding())
+                    .setParameter("date", sevenYearsAgo)
+                    .getSingleResult();
+            transaction.commit();
+        }catch (NoResultException | NonUniqueResultException e){
+            throw new IllegalArgumentException(e);
+        }catch (IllegalStateException e){
+            throw new IllegalArgumentException("Not fully created object passed",e);
+        }
+
+        return countOfPeopleInBuilding;
+    }
+
+    public static long getCountOfPetsInBuilding(Building building){
+        ensureNotNull(building);
+
+        long countOfPetsInBuilding;
+        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            //gets all contracts where Employee works in the company which was given
+            countOfPetsInBuilding = session
+                    .createQuery("" +
+                            "SELECT COUNT(a) " +
+                            "FROM Apartment a " +
+                            "INNER JOIN a.petsByIdApartment " +
+                            "WHERE a.buildingByBuildingId.idBuilding = :id " +
+                            "", Long.class)
+                    .setParameter("id", building.getIdBuilding())
+                    .getSingleResult();
+            transaction.commit();
+        }catch (NoResultException | NonUniqueResultException e){
+            throw new IllegalArgumentException(e);
+        }catch (IllegalStateException e){
+            throw new IllegalArgumentException("Not fully created object passed",e);
+        }
+
+        return countOfPetsInBuilding;
+    }
+
+    public static Tax getTaxOfBuilding(Building building, TaxType taxType){
+        ensureNotNull(building);
+        ensureNotNull(taxType);
+
+        Tax tax;
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+            String hql = "SELECT t FROM Tax t WHERE t.id.buildingByBuildingId.idBuilding = :id AND t.id.type =:taxType";
+            session.beginTransaction();
+            tax = session
+                    .createQuery(hql, Tax.class)
+                    .setParameter("id", building.getIdBuilding())
+                    .setParameter("taxType", taxType)
+                    .getSingleResult();
+
+            session.getTransaction().commit();
+
+            if(tax == null){
+                throw new IllegalArgumentException("Can not find tax: ("+taxType.name()+") for building with id: "+building.getIdBuilding());
+            }
+
+        }catch (Exception e){
+            throw new IllegalArgumentException(e);
+        }
+
+        return tax;
+    }
+
+
 
     public static <T> void ensureNotNull(T company) {
         if (company == null) {

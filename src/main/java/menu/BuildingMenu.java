@@ -47,11 +47,11 @@ public class BuildingMenu extends AbstractMenu {
     //  |  1.  Create a new building                         | DONE
     //  |  2.  Edit a building name                          | DONE
     //  |  3.  Edit a building address                       | DONE
-    //  |  4.  Delete a building                             | NO
+    //  |  4.  Delete a building                             | DONE
     //  |  5.  List all apartments in the building           | DONE
     //  |  6.  List all apartments by floor in building      | DONE
-    //  |  7.  List all apartments by buildings              | DOEN
-    //  |  8.  Print all fees combined for whole building    | NO
+    //  |  7.  List all apartments by buildings              | DONE
+    //  |  8.  Print all fees combined for whole building    | DONE
     //  |  9.  Print all fees per every building by every    | NO
     //  |      company                                       | -
     //  |  10.  Print names and id of employee which manages | NO
@@ -77,12 +77,12 @@ public class BuildingMenu extends AbstractMenu {
         BuildingDAO.saveBuilding(building);
     }
 
-    private Building getBuildingFromUserInput() throws NoSuchElementException, IllegalArgumentException, ArrayIndexOutOfBoundsException{
+    private Building getBuildingFromUserInput() throws NoSuchElementException, IllegalArgumentException, ArrayIndexOutOfBoundsException {
         System.out.print("Enter the building's NAME (space) building's ADDRESS and press (ENTER): ");
         String[] buildingInfo = userInput.nextLine().split(" ");
         Building building = new Building(sanitizeString(buildingInfo[1]), sanitizeString(buildingInfo[0]));
 
-        if(BuildingDAO.addressExists(building)){
+        if (BuildingDAO.addressExists(building)) {
             throw new IllegalArgumentException("Building with this address already exists!");
         }
 
@@ -105,12 +105,12 @@ public class BuildingMenu extends AbstractMenu {
         BuildingDAO.updateBuilding(building);
     }
 
-    private Building getBuildingByIdFromUser(){
+    private Building getBuildingByIdFromUser() {
         System.out.print("Enter the building's ID and press (ENTER): ");
         String buildingId = userInput.nextLine();
         long id = Integer.parseInt(buildingId);
 
-        if(!BuildingDAO.exists(id)){
+        if (!BuildingDAO.exists(id)) {
             throw new IllegalArgumentException("Building with this ID does NOT exist!");
         }
 
@@ -147,23 +147,29 @@ public class BuildingMenu extends AbstractMenu {
         int floor = Integer.parseInt(userInput.nextLine());
 
         List<Apartment> apartmentsOfFloor = BuildingDAO.getApartmentsInBuildingByFloor(building, floor).stream().toList();
-        System.out.println("\nAll apartments on floor ["+floor+"]:");
+        System.out.println("\nAll apartments on floor [" + floor + "]:");
         apartmentsOfFloor.forEach(System.out::println);
     }
 
     private void listAllApartmentsByBuildings() {
         BuildingDAO.getAllApartmentsByBuildings().forEach((building, apartments) -> {
-            System.out.println("\n["+building.getIdBuilding()+"] "+ building.getName() + " has apartments:");
+            System.out.println("\n[" + building.getIdBuilding() + "] " + building.getName() + " has apartments:");
             apartments.forEach(apartment -> System.out.println("\t" + apartment));
         });
     }
 
     private void printTotalTaxOfBuilding() {
-        //get tax for people
-        //get tax for pets
+        Building building = getBuildingByIdFromUser();
 
-        //gets count of people in building
-        //gets count of pets in building
+        long countOfPeople = BuildingDAO.getCountOfPeopleInBuilding(building);
+        Tax taxPeople = BuildingDAO.getTaxOfBuilding(building, TaxType.PEOPLE);
+
+        long countOfPets = BuildingDAO.getCountOfPetsInBuilding(building);
+        Tax taxPets = BuildingDAO.getTaxOfBuilding(building, TaxType.PET);
+
+        System.out.println("Count of pets: " + countOfPets + " * fee: " + taxPets.getFee() + " = " + (countOfPets * taxPets.getFee()));
+        System.out.println("Count of people: " + countOfPeople + " * fee: " + taxPeople.getFee() + " = " + (countOfPeople * taxPeople.getFee()));
+        System.out.println("\tSUM: " + ((countOfPets * taxPets.getFee()) + (countOfPeople * taxPeople.getFee())));
     }
 
     private void printTotalTaxOfBuildingsOfCompany() {
@@ -177,14 +183,14 @@ public class BuildingMenu extends AbstractMenu {
     private void printAddressOfBuilding() {
         Building building = getBuildingByIdFromUser();
         Building buildingFromDB = BuildingDAO.getBuildingById(building.getIdBuilding());
-        String message = String.format("Address of building with id[%d] %s",buildingFromDB.getIdBuilding(),buildingFromDB.getAddress());
+        String message = String.format("Address of building with id[%d] %s", buildingFromDB.getIdBuilding(), buildingFromDB.getAddress());
         System.out.println(message);
     }
 
     private void printNameOfBuilding() {
         Building building = getBuildingByIdFromUser();
         Building buildingFromDB = BuildingDAO.getBuildingById(building.getIdBuilding());
-        String message = String.format("Name of building with id[%d] %s",buildingFromDB.getIdBuilding(),buildingFromDB.getName());
+        String message = String.format("Name of building with id[%d] %s", buildingFromDB.getIdBuilding(), buildingFromDB.getName());
         System.out.println(message);
     }
 
@@ -198,7 +204,7 @@ public class BuildingMenu extends AbstractMenu {
 
         Tax tax = new Tax(building, taxType, taxFee);
 
-        if(TaxDAO.exists(tax)){
+        if (TaxDAO.exists(tax)) {
             throw new IllegalArgumentException("Tax already set for this building");
         }
 
@@ -206,24 +212,24 @@ public class BuildingMenu extends AbstractMenu {
         System.out.println("Successfully assigned NEW tax");
     }
 
-    private TaxType getTaxTypeFromUser(){
+    private TaxType getTaxTypeFromUser() {
         System.out.println("Type the type number of the tax");
         System.out.println("1 - People");
         System.out.println("2 - Pets");
 
         int taxNumber = Integer.parseInt(userInput.nextLine().trim());
 
-        if(taxNumber == 1){
+        if (taxNumber == 1) {
             return TaxType.PEOPLE;
-        }else if(taxNumber == 2){
+        } else if (taxNumber == 2) {
             return TaxType.PET;
         }
 
-        throw  new IllegalArgumentException("No valid input");
+        throw new IllegalArgumentException("No valid input");
     }
 
-    public void checkIfNegative(int n){
-        if(n<0){
+    public void checkIfNegative(int n) {
+        if (n < 0) {
             throw new IllegalArgumentException("Negative value passed");
         }
     }
@@ -234,7 +240,7 @@ public class BuildingMenu extends AbstractMenu {
 
         Tax tax = new Tax(building, taxType);
 
-        if(!TaxDAO.exists(tax)){
+        if (!TaxDAO.exists(tax)) {
             throw new IllegalArgumentException("Tax NOT set for this building");
         }
 
@@ -248,11 +254,11 @@ public class BuildingMenu extends AbstractMenu {
         String message = String.format("Taxes of building %s with id[%d]:", buildingFromDB.getName(), buildingFromDB.getIdBuilding());
         System.out.println(message);
         List<Tax> taxes = BuildingDAO.getAllTaxes(building).stream().toList();
-        System.out.println("\t"+"-".repeat(35));
+        System.out.println("\t" + "-".repeat(35));
         System.out.println("\t|  Building  |  TaxType  |  Fee  |");
-        System.out.println("\t"+"-".repeat(35));
+        System.out.println("\t" + "-".repeat(35));
         taxes.forEach(tax -> {
-            System.out.println("\t"+tax.getBuildingByBuildingId().getName()+" | "+tax.getType()+" | "+tax.getFee());
+            System.out.println("\t" + tax.getBuildingByBuildingId().getName() + " | " + tax.getType() + " | " + tax.getFee());
         });
     }
 
@@ -262,7 +268,7 @@ public class BuildingMenu extends AbstractMenu {
 
         Tax tax = new Tax(building, taxType);
 
-        if(!TaxDAO.exists(tax)){
+        if (!TaxDAO.exists(tax)) {
             throw new IllegalArgumentException("Tax NOT set for this building");
         }
 
