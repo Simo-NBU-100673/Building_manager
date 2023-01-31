@@ -1,6 +1,7 @@
 package entity;
 
 import jakarta.persistence.*;
+import tax.type.TaxType;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -17,7 +18,23 @@ public class TaxPK implements Serializable {
     private Building buildingByBuildingId;
 
     @Id
-    @Column(name = "Fee", nullable = false)
-    private long fee;
+    @Column(name = "Type", nullable = false, length = 45)
+    @Enumerated(EnumType.STRING)
+    private TaxType type;
 
+    public Building getBuildingByBuildingId() {
+        return buildingByBuildingId;
+    }
+
+    public void setBuildingByBuildingId(Building buildingByBuildingId) {
+        this.buildingByBuildingId = buildingByBuildingId;
+    }
+
+    public TaxType getType() {
+        return type;
+    }
+
+    public void setType(TaxType type) {
+        this.type = type;
+    }
 }

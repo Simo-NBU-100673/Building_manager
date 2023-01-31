@@ -7,7 +7,7 @@
   |  4.  Delete a building                             |
   |  5.  List all apartments in the building           |
   |  6.  List all apartments by floor in building      |
-  |  7.  List all apartments by building and floor     |
+  |  7.  List all apartments by building               |
   |  8.  Print all fees combined for whole building    |
   |  9.  Print all fees per every building by every    |
   |      company                                       |

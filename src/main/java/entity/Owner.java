@@ -20,4 +20,12 @@ public class Owner {
     @OneToMany(mappedBy = "ownerByOwnerId")
     private Collection<Apartment> apartmentsByIdOwner;
 
+    @Override
+    public String toString() {
+        return "Owner{" +
+                "idOwner=" + idOwner +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 }

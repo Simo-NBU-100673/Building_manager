@@ -27,4 +27,13 @@ public class Apartment {
     @OneToMany(mappedBy = "apartmentByApartmentId")
     private Collection<Resident> residentsByIdApartment;
 
+    @Override
+    public String toString() {
+        return "Apartment{" +
+                "idApartment=" + idApartment +
+                ", floor=" + floor +
+                ", buildingByBuildingId=" + buildingByBuildingId +
+                ", ownerByOwnerId=" + ownerByOwnerId +
+                '}';
+    }
 }

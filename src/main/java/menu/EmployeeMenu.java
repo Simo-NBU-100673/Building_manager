@@ -32,7 +32,7 @@ public class EmployeeMenu extends AbstractMenu {
         try {
             super.actions.get(num).run();
 
-        } catch (NullPointerException | NoSuchElementException | IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+        } catch (Exception e) {
             printErrMessage(e.getMessage());
         }
     }
@@ -58,7 +58,6 @@ public class EmployeeMenu extends AbstractMenu {
     //  |====================================================|
 
     private void createNewEmployee() {
-        //!To make methods for ArrayIndexOutOfBoundsException and NoSuchElementException
         System.out.println("Enter employee's {first_name} (SPACE) {last_name} and press (ENTER)");
 
         String[] names = userInput.nextLine().split(" ");//NoSuchElementException
@@ -72,14 +71,13 @@ public class EmployeeMenu extends AbstractMenu {
             System.out.println("Do you want to create a new employee with same names? (Y/N)");
             String answer = userInput.nextLine();
 
-            if(checkAnswer(answer)) {
-                EmployeeDAO.saveEmployee(employee);
+            if(!checkAnswer(answer)) {
+                return;
             }
-
-        }else {
-            EmployeeDAO.saveEmployee(employee);
-            System.out.println("Employee created successfully");
         }
+
+        EmployeeDAO.saveEmployee(employee);
+        System.out.println("Employee created successfully");
     }
 
     private boolean checkAnswer(String answer) {
@@ -217,23 +215,23 @@ public class EmployeeMenu extends AbstractMenu {
 
     private void listAllEmployeesManagingBuildings() {
         EmployeeDAO.getBuildingsForEmployee().forEach((employee, buildings) -> {
-            System.out.println("\n"+employee);
+            System.out.println("\n["+employee.getIdEmployee()+"] "+employee.getFirstName() + " " + employee.getLastName() + " manages these buildings:");
             buildings.forEach(building -> System.out.println("\t" + building));
         });
     }
 
     private void listAllEmployees() {
-        //create a list of employees with EmployeeDAO.getAllEmployees() and print it
-        List<Employee> employees = (List<Employee>) EmployeeDAO.getAllEmployees();
-
-        //check if the list is empty
-        if (employees.isEmpty()) {
-            throw new IllegalArgumentException("There are no employees");
+        List<Employee> employees = EmployeeDAO.getAllEmployees().stream().toList();
+        System.out.println("\n            [All employees]");
+        System.out.println("  -------------------------------------");
+        System.out.println("  | id |  first_name   |  last_name   |");
+        System.out.println("  -------------------------------------");
+        for (Employee employee : employees) {
+            System.out.println("  | " + employee.getIdEmployee() + " | " +
+                    employee.getFirstName() + " | " +
+                    employee.getLastName() + " |");
         }
-
-        //print the list
-        System.out.println("All employees:");
-        employees.forEach(System.out::println);
+        System.out.println("  -------------------------------------");
     }
 
     private void ensureEmployeeNotExists(Employee employee) throws IllegalArgumentException {

@@ -29,6 +29,10 @@ public class Building {
         this.name = "No name";
     }
 
+    public Building(long idBuilding) {
+        this.idBuilding = idBuilding;
+    }
+
     public Building(String address, String name) {
         this.address = address;
         this.name = name;
@@ -60,5 +64,53 @@ public class Building {
                 ", address='" + address + '\'' +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public long getIdBuilding() {
+        return idBuilding;
+    }
+
+    public void setIdBuilding(long idBuilding) {
+        this.idBuilding = idBuilding;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Collection<Apartment> getApartmentsByIdBuilding() {
+        return apartmentsByIdBuilding;
+    }
+
+    public void setApartmentsByIdBuilding(Collection<Apartment> apartmentsByIdBuilding) {
+        this.apartmentsByIdBuilding = apartmentsByIdBuilding;
+    }
+
+    public Contract getContractByIdBuilding() {
+        return contractByIdBuilding;
+    }
+
+    public void setContractByIdBuilding(Contract contractByIdBuilding) {
+        this.contractByIdBuilding = contractByIdBuilding;
+    }
+
+    public Collection<Tax> getTaxesByIdBuilding() {
+        return taxesByIdBuilding;
+    }
+
+    public void setTaxesByIdBuilding(Collection<Tax> taxesByIdBuilding) {
+        this.taxesByIdBuilding = taxesByIdBuilding;
     }
 }
