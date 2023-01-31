@@ -173,6 +173,34 @@ public class BuildingDAO extends GenericDAO<Building>{
 
     }
 
+    public static List<Tax> getAllTaxes(Building building){
+        ensureNotNull(building);
+
+        List<Tax> taxes;
+        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+            String hql = "SELECT t FROM Tax t WHERE t.id.buildingByBuildingId.idBuilding = :id";
+            session.beginTransaction();
+            taxes = session
+                    .createQuery(hql, Tax.class)
+                    .setParameter("id", building.getIdBuilding())
+                    .getResultList();
+
+            session.getTransaction().commit();
+
+            if(taxes.isEmpty()){
+                throw new IllegalArgumentException("No Taxes for this building");
+            }
+
+        }catch (Exception e){
+            throw new IllegalArgumentException(e);
+        }
+        return taxes;
+    }
+
+    public static void deleteBuilding(Building building){
+        BUILDING_DAO.delete(building);
+    }
+
     public static <T> void ensureNotNull(T company) {
         if (company == null) {
             throw new IllegalArgumentException();

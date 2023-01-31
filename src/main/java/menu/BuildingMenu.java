@@ -44,24 +44,24 @@ public class BuildingMenu extends AbstractMenu {
         actions.put(16, this::editTaxForBuilding);
     }
 
-    //  |  1.  Create a new building                         |
-    //  |  2.  Edit a building name                          |
-    //  |  3.  Edit a building address                       |
-    //  |  4.  Delete a building                             |
-    //  |  5.  List all apartments in the building           |
-    //  |  6.  List all apartments by floor in building      |
-    //  |  7.  List all apartments by buildings     |
-    //  |  8.  Print all fees combined for whole building    |
-    //  |  9.  Print all fees per every building by every    |
-    //  |      company                                       |
-    //  |  10.  Print names and id of employee which manages |
-    //  |      building by ****                              |
-    //  |  11. Print address of building                     |
-    //  |  12. Print name of building                        |
-    //  |  13. Assign new tax                                |
-    //  |  14. Remove a tax from building                    |
-    //  |  15. Print all taxes of building                   |
-    //  |  16. Edit a tax of building                        |
+    //  |  1.  Create a new building                         | DONE
+    //  |  2.  Edit a building name                          | DONE
+    //  |  3.  Edit a building address                       | DONE
+    //  |  4.  Delete a building                             | NO
+    //  |  5.  List all apartments in the building           | DONE
+    //  |  6.  List all apartments by floor in building      | DONE
+    //  |  7.  List all apartments by buildings              | DOEN
+    //  |  8.  Print all fees combined for whole building    | NO
+    //  |  9.  Print all fees per every building by every    | NO
+    //  |      company                                       | -
+    //  |  10.  Print names and id of employee which manages | NO
+    //  |      building by ****                              | -
+    //  |  11. Print address of building                     | DONE
+    //  |  12. Print name of building                        | DONE
+    //  |  13. Assign new tax                                | DONE
+    //  |  14. Remove a tax from building                    | DONE
+    //  |  15. Print all taxes of building                   | DONE
+    //  |  16. Edit a tax of building                        | DONE
 
     @Override
     protected void handleInput(int num) {
@@ -129,7 +129,9 @@ public class BuildingMenu extends AbstractMenu {
 
     //Maybe here must use cascade when removing
     private void deleteBuilding() {
-        System.out.println("Delete building");
+        Building building = getBuildingByIdFromUser();
+        Building buildingFromDB = BuildingDAO.getBuildingById(building.getIdBuilding());
+        BuildingDAO.deleteBuilding(buildingFromDB);
     }
 
     private void listAllApartmentsInBuilding() {
@@ -173,11 +175,17 @@ public class BuildingMenu extends AbstractMenu {
     }
 
     private void printAddressOfBuilding() {
-        System.out.println("Print address of building");
+        Building building = getBuildingByIdFromUser();
+        Building buildingFromDB = BuildingDAO.getBuildingById(building.getIdBuilding());
+        String message = String.format("Address of building with id[%d] %s",buildingFromDB.getIdBuilding(),buildingFromDB.getAddress());
+        System.out.println(message);
     }
 
     private void printNameOfBuilding() {
-        System.out.println("Print name of building");
+        Building building = getBuildingByIdFromUser();
+        Building buildingFromDB = BuildingDAO.getBuildingById(building.getIdBuilding());
+        String message = String.format("Name of building with id[%d] %s",buildingFromDB.getIdBuilding(),buildingFromDB.getName());
+        System.out.println(message);
     }
 
     private void assignNewTaxForBuilding() {
@@ -235,7 +243,17 @@ public class BuildingMenu extends AbstractMenu {
     }
 
     private void printAllTaxesOfBuilding() {
-        System.out.println("Print all taxes of building");
+        Building building = getBuildingByIdFromUser();
+        Building buildingFromDB = BuildingDAO.getBuildingById(building.getIdBuilding());
+        String message = String.format("Taxes of building %s with id[%d]:", buildingFromDB.getName(), buildingFromDB.getIdBuilding());
+        System.out.println(message);
+        List<Tax> taxes = BuildingDAO.getAllTaxes(building).stream().toList();
+        System.out.println("\t"+"-".repeat(35));
+        System.out.println("\t|  Building  |  TaxType  |  Fee  |");
+        System.out.println("\t"+"-".repeat(35));
+        taxes.forEach(tax -> {
+            System.out.println("\t"+tax.getBuildingByBuildingId().getName()+" | "+tax.getType()+" | "+tax.getFee());
+        });
     }
 
     private void editTaxForBuilding() {

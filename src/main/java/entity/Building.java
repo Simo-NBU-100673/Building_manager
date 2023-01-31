@@ -17,11 +17,11 @@ public class Building {
     @Basic
     @Column(name = "name", nullable = false, length = 255)
     private String name;
-    @OneToMany(mappedBy = "buildingByBuildingId")
+    @OneToMany(mappedBy = "buildingByBuildingId", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<Apartment> apartmentsByIdBuilding;
-    @OneToOne(mappedBy = "buildingByBuildingId")
+    @OneToOne(mappedBy = "buildingByBuildingId", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Contract contractByIdBuilding;
-    @OneToMany(mappedBy = "buildingByBuildingId")
+    @OneToMany(mappedBy = "buildingByBuildingId", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<Tax> taxesByIdBuilding;
 
     public Building() {

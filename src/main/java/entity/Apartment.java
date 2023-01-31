@@ -20,11 +20,11 @@ public class Apartment {
     @ManyToOne
     @JoinColumn(name = "Owner_id", referencedColumnName = "idOwner", nullable = false)
     private Owner ownerByOwnerId;
-    @OneToMany(mappedBy = "apartmentByApartmentsId")
+    @OneToMany(mappedBy = "apartmentByApartmentsId", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<Paymentshistory> paymentshistoriesByIdApartment;
-    @OneToMany(mappedBy = "apartmentByApartmentId")
+    @OneToMany(mappedBy = "apartmentByApartmentId", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<Pet> petsByIdApartment;
-    @OneToMany(mappedBy = "apartmentByApartmentId")
+    @OneToMany(mappedBy = "apartmentByApartmentId", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<Resident> residentsByIdApartment;
 
     @Override
