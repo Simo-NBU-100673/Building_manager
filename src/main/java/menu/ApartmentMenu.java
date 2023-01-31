@@ -1,5 +1,11 @@
 package menu;
 
+import dao.ApartmentDAO;
+import dao.BuildingDAO;
+import dao.OwnerDAO;
+import entity.Apartment;
+import entity.Building;
+import entity.Owner;
 import menu.string.container.MenuErrStringContainer;
 
 import java.util.Map;
@@ -63,15 +69,78 @@ public class ApartmentMenu extends AbstractMenu {
     }
 
     private void createNewApartment() {
+        Apartment apartment = getApartmentFromUserInput();
+        ApartmentDAO.saveApartment(apartment);
+    }
 
+    private Apartment getApartmentFromUserInput(){
+        System.out.println("Type for Apartment: {floor} (space) {building_id} (space) {owner_id} and press (ENTER)");
+        String[] tokens = userInput.nextLine().split(" ");
+        int floor = Integer.parseInt(tokens[0]);
+
+        long idBuilding = Long.parseLong(tokens[1]);
+        Building building = getBuildingById(idBuilding);
+
+        long idOwner = Long.parseLong(tokens[2]);
+        Owner owner = getOwnerById(idOwner);
+
+        Apartment apartment = new Apartment(floor, building, owner);
+
+        return apartment;
+    }
+
+    private Building getBuildingById(long id){
+        if (!BuildingDAO.exists(id)) {
+            throw new IllegalArgumentException("Building with this ID does NOT exist!");
+        }
+
+        Building building = BuildingDAO.getBuildingById(id);
+
+        return building;
+    }
+
+    private Owner getOwnerById(long id){
+        if (!OwnerDAO.exists(id)) {
+            throw new IllegalArgumentException("Owner with this ID does NOT exist!");
+        }
+
+        Owner owner = OwnerDAO.getOwnerById(id);
+
+        return owner;
     }
 
     private void editApartment() {
+        Apartment apartment = getApartmentByIdFromUser();
+        Apartment apartmentUserInput = getApartmentFromUserInput();
 
+        int floor = apartmentUserInput.getFloor();
+        Building building = apartmentUserInput.getBuildingByBuildingId();
+        Owner owner = apartmentUserInput.getOwnerByOwnerId();
+
+        apartment.setFloor(floor);
+        apartment.setBuildingByBuildingId(building);
+        apartment.setOwnerByOwnerId(owner);
+
+        ApartmentDAO.updateApartment(apartment);
+    }
+
+    private Apartment getApartmentByIdFromUser() {
+        System.out.print("Enter the apartment's ID and press (ENTER): ");
+        String buildingId = userInput.nextLine();
+        long id = Integer.parseInt(buildingId);
+
+        if (!ApartmentDAO.exists(id)) {
+            throw new IllegalArgumentException("Apartment with this ID does NOT exist!");
+        }
+
+        Apartment apartment = ApartmentDAO.getApartmentById(id);
+
+        return apartment;
     }
 
     private void deleteApartment() {
-
+        Apartment apartment = getApartmentByIdFromUser();
+        ApartmentDAO.deleteApartment(apartment);
     }
 
     private void listAllResidentsInApartment() {
